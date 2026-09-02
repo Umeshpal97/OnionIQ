@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OnionIQ - AI Oninon Quality Assessment</title>
+
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+
+        <div class="logo">
+            🧅 Onion<span>IQ</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#assessment">Assessment</a>
+            <a href="#dashboard">Dashboard</a>
+        </div>
+
+        <button class="nav-btn">Start Assessment</button>
+
+    </nav>
+
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+
+        <div class="hero-content">
+
+            <p class="tag">AI-POWERED AGRICULTURE</p>
+
+            <h1>
+                Smart Onion
+                <span>Quality Assessment</span>
+            </h1>
+
+            <p class="hero-text">
+                Standardize onion quality assessment using AI-powered
+                visual analysis and digital grading.
+            </p>
+
+            <div class="hero-buttons">
+                <button onclick="scrollToAssessment()" class="primary-btn">
+                    Start Assessment →
+                </button>
+
+                <button onclick="showDemo()" class="secondary-btn">
+                    View Demo
+                </button>
+            </div>
+
+        </div>
+
+
+        <div class="hero-image">
+
+            <div class="onion-circle">
+                🧅
+            </div>
+
+            <div class="floating-card card-one">
+                <strong>86/100</strong>
+                <small>Quality Score</small>
+            </div>
+
+            <div class="floating-card card-two">
+                <strong>Grade A</strong>
+                <small>AI Assessment</small>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PROBLEM -->
+    <section class="problem">
+
+        <p class="section-tag">THE PROBLEM</p>
+
+        <h2>
+            Onion grading shouldn't depend
+            <span>only on human judgement.</span>
+        </h2>
+
+        <div class="problem-grid">
+
+            <div class="problem-card">
+                <div>👁️</div>
+                <h3>Subjective Assessment</h3>
+                <p>
+                    Quality evaluation can vary between different
+                    procurement centers and assessors.
+                </p>
+            </div>
+
+            <div class="problem-card">
+                <div>⚠️</div>
+                <h3>Inconsistent Grading</h3>
+                <p>
+                    Different assessments can create disputes between
+                    farmers and buyers.
+                </p>
+            </div>
+
+            <div class="problem-card">
+                <div>📄</div>
+                <h3>No Digital Record</h3>
+                <p>
+                    Manual assessment makes tracking and verification
+                    difficult.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+<!-- ASSESSMENT -->
+<section class="assessment" id="assessment">
+
+    <div class="section-heading">
+
+        <p class="section-tag">AI ASSESSMENT</p>
+
+        <h2>Assess Your Onion Batch</h2>
+
+        <p>
+            Upload an image and enter batch information to generate
+            an AI-assisted quality assessment.
+        </p>
+
+    </div>
+
+
+    <!-- TWO COLUMN CONTAINER -->
+    <div class="assessment-container">
+
+
+        <!-- ======================================
+             LEFT SIDE
+        ======================================= -->
+
+        <div class="assessment-form">
+
+            <!-- FARMER NAME -->
+
+            <div class="input-group">
+
+                <label>Farmer Name</label>
+
+                <input
+                    type="text"
+                    id="farmerName"
+                    placeholder="Enter farmer name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- BATCH + QUANTITY -->
+
+            <div class="two-input">
+
+                <div class="input-group">
+
+                    <label>Batch ID</label>
+
+                    <input
+                        type="text"
+                        id="batchId"
+                        readonly placeholder="Auto-generated Batch ID"
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label>Quantity (kg)</label>
+
+                    <input
+                        type="number"
+                        id="quantity"
+                        placeholder="Enter quantity"
+                        min="1"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- LOCATION -->
+
+            <div class="input-group">
+
+                <label>Location</label>
+
+                <input
+                    type="text"
+                    id="location"
+                    placeholder="Enter location"
+                    required
+                >
+
+            </div>
+
+
+            <!-- ======================================
+                 SCAN ONION
+            ======================================= -->
+
+            <div class="upload-box">
+
+                <div class="upload-icon">
+                    📷
+                </div>
+
+                <h3>
+                    Scan Onion Quality
+                </h3>
+
+                <p>
+                    Use camera or select an image
+                </p>
+
+
+                <!-- BUTTONS -->
+
+                <div class="scan-buttons">
+
+                    <button
+                        type="button"
+                        class="scan-btn"
+                        onclick="openCamera()"
+                    >
+                        📷 Scan with Camera
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="gallery-btn"
+                        onclick="openGallery()"
+                    >
+                        🖼️ Choose from Gallery
+                    </button>
+
+                </div>
+
+
+                <!-- GALLERY INPUT -->
+
+                <input
+                    type="file"
+                    id="galleryInput"
+                    accept="image/*"
+                    hidden
+                >
+
+
+                <!-- IMAGE PREVIEW -->
+
+                <div
+                    id="imagePreview"
+                    class="image-preview"
+                ></div>
+
+            </div>
+
+
+            <!-- ======================================
+                 CAMERA MODAL
+            ======================================= -->
+
+            <div
+                id="cameraModal"
+                class="camera-modal"
+            >
+
+                <div class="camera-box">
+
+
+                    <button
+                        type="button"
+                        class="close-camera"
+                        onclick="closeCamera()"
+                    >
+                        ✕
+                    </button>
+
+
+                    <h3>
+                        📷 Scan Onion
+                    </h3>
+
+
+                    <video
+                        id="cameraVideo"
+                        autoplay
+                        playsinline
+                    ></video>
+
+
+                    <button
+                        type="button"
+                        class="capture-btn"
+                        onclick="captureImage()"
+                    >
+                        📸 Capture
+                    </button>
+
+
+                    <canvas
+                        id="cameraCanvas"
+                        hidden
+                    ></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ======================================
+             RIGHT SIDE - RESULT
+        ======================================= -->
+
+        <div class="result-panel" id="resultPanel">
+
+            <div class="result-placeholder">
+
+                <div class="big-icon">
+                    🧅
+                </div>
+
+                <h3>
+                    Assessment Result
+                </h3>
+
+                <p>
+                    Scan an onion image to see the
+                    quality assessment.
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+    <!-- DASHBOARD -->
+
+    <section class="dashboard" id="dashboard">
+
+        <div class="section-heading">
+
+            <p class="section-tag">ANALYTICS</p>
+
+            <h2>Procurement Dashboard</h2>
+
+        </div>
+
+
+        <div class="stats">
+
+            <div class="stat-card">
+                <span>📦</span>
+                <h3>1,248</h3>
+                <p>Total Batches</p>
+            </div>
+
+            <div class="stat-card">
+                <span>🟢</span>
+                <h3>42%</h3>
+                <p>Grade A</p>
+            </div>
+
+            <div class="stat-card">
+                <span>🟡</span>
+                <h3>38%</h3>
+                <p>Grade B</p>
+            </div>
+
+            <div class="stat-card">
+                <span>🔴</span>
+                <h3>20%</h3>
+                <p>Grade C</p>
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-table">
+
+            <h3>Recent Assessments</h3>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Location</th>
+                        <th>Score</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>ON-001</td>
+                        <td>Bareilly</td>
+                        <td>86</td>
+                        <td class="grade-a">A</td>
+                    </tr>
+
+                    <tr>
+                        <td>ON-002</td>
+                        <td>Shahjahanpur</td>
+                        <td>72</td>
+                        <td class="grade-b">B</td>
+                    </tr>
+
+                    <tr>
+                        <td>ON-003</td>
+                        <td>Lucknow</td>
+                        <td>55</td>
+                        <td class="grade-c">C</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="logo">
+            🧅 Onion<span>IQ</span>
+        </div>
+
+        <p>
+            AI-assisted onion quality assessment platform.
+        </p>
+
+        <p class="copyright">
+            © 2026 OnionIQ
+        </p>
+
+    </footer>
+
+
+    <script src="./js/script.js"></script>
+
+</body>
+</html>
