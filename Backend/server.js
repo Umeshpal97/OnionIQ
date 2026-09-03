@@ -114,7 +114,7 @@ Return only the JSON object.
     }
 });
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`OnionIQ Backend running on http://localhost:${PORT}`);
