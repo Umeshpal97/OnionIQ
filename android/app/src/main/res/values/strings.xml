@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">OnionIQ</string>
+    <string name="title_activity_main">OnionIQ</string>
+    <string name="package_name">com.onioniq.app</string>
+    <string name="custom_url_scheme">com.onioniq.app</string>
+</resources>

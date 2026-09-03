@@ -1294,7 +1294,7 @@ async function analyzeCapturedImage() {
         const response =
             await fetch(
 
-                "http://localhost:5000/analyze-onion",
+                "https://onioniq-vvar.onrender.com/analyze-onion",
 
                 {
 
