@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Assessment History - OnionIQ</title>
+
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <header class="top-header">
+
+    <a href="./index.html" class="logo">
+        🧅 <span>Onion</span>IQ
+    </a>
+
+
+    <!-- DESKTOP NAVIGATION -->
+
+    <nav class="desktop-nav">
+
+        <a href="./index.html">
+            Home
+        </a>
+
+        <a href="./assessment.html">
+            New Assessment
+        </a>
+
+        <a href="./dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="./history.html">
+            History
+        </a>
+
+        <a href="./about.html">
+            About OnionIQ
+        </a>
+
+    </nav>
+
+
+    <!-- MOBILE MENU BUTTON -->
+
+    <button
+        class="menu-btn">
+
+        ☰
+
+    </button>
+
+</header>
+
+
+    <!-- ================= SIDE MENU ================= -->
+
+    <div id="menuOverlay"
+         class="menu-overlay"
+         onclick="closeMenu()">
+    </div>
+
+
+    <aside id="sideMenu" class="side-menu">
+
+        <div class="menu-header">
+
+            <a href="./index.html" class="logo">
+                🧅 <span>Onion</span>IQ
+            </a>
+
+            <button class="close-menu"
+                    onclick="closeMenu()">
+                ✕
+            </button>
+
+        </div>
+
+
+        <div class="menu-links">
+
+            <a href="./index.html">
+                🏠
+                <span>Home</span>
+            </a>
+
+            <a href="./assessment.html">
+                🧅
+                <span>New Assessment</span>
+            </a>
+
+            <a href="./dashboard.html">
+                📊
+                <span>Dashboard</span>
+            </a>
+
+            <a href="./history.html"
+               class="menu-active">
+                🕘
+                <span>History</span>
+            </a>
+
+            <a href="./about.html">
+                ℹ️
+                <span>About OnionIQ</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- ================= HISTORY PAGE ================= -->
+
+<main class="history-page">
+
+    <!-- PAGE HEADING -->
+
+    <section class="page-heading">
+
+        <p class="section-tag">
+            RECORDS
+        </p>
+
+        <h1>
+            Assessment
+            <span>History</span>
+        </h1>
+
+        <p>
+            View previous onion quality assessments
+            and their grading results.
+        </p>
+
+    </section>
+
+
+    <!-- ================= SEARCH ================= -->
+
+    <section class="history-tools">
+
+        <div class="history-search">
+
+            <span>🔍</span>
+
+            <input
+                type="text"
+                id="historySearch"
+                placeholder="Search batch, farmer or location..."
+                oninput="searchHistory()"
+            >
+
+        </div>
+
+        <button
+            class="filter-btn"
+            onclick="clearHistorySearch()">
+
+            Clear
+
+        </button>
+
+    </section>
+
+
+    <!-- ================= HISTORY LIST ================= -->
+
+    <section
+        class="history-list"
+        id="historyList">
+
+        <div
+            id="loadingHistory"
+            class="empty-history">
+
+            <div>⏳</div>
+
+            <h3>
+                Loading assessments...
+            </h3>
+
+            <p>
+                Fetching your assessment history.
+            </p>
+
+        </div>
+
+
+        <div
+            id="noHistory"
+            class="empty-history"
+            style="display: none;">
+
+            <div>
+                🕘
+            </div>
+
+            <h3>
+                No assessments found
+            </h3>
+
+            <p>
+                Try searching with a different
+                batch, farmer or location.
+            </p>
+
+        </div>
+
+    </section>
+
+
+        <!-- ================= NEW ASSESSMENT ================= -->
+
+        <section class="history-cta">
+
+            <h2>
+                Need to assess another batch?
+            </h2>
+
+            <p>
+                Start a new AI-powered onion quality assessment.
+            </p>
+
+            <a href="./assessment.html"
+               class="primary-btn">
+
+                + New Assessment
+
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= BOTTOM NAV ================= -->
+
+    <nav class="bottom-nav">
+
+        <a href="./index.html"
+           class="bottom-nav-item">
+
+            <span>🏠</span>
+            <small>Home</small>
+
+        </a>
+
+
+        <a href="./assessment.html"
+           class="bottom-nav-item">
+
+            <span>🧅</span>
+            <small>New Assessment</small>
+
+        </a>
+
+
+        <a href="./dashboard.html"
+           class="bottom-nav-item">
+
+            <span>📊</span>
+            <small>Dashboard</small>
+
+        </a>
+
+    </nav>
+
+<script src="./js/script.js"></script>
+
+</body>
+
+</html>

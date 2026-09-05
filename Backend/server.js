@@ -2,9 +2,26 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const multer = require("multer");
+const mongoose = require("mongoose");
 const { GoogleGenAI } = require("@google/genai");
+const Assessment = require("./models/assessment");
 
 dotenv.config();
+
+// =========================
+// MongoDB Connection
+// =========================
+
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => {
+        console.log("MongoDB Connected Successfully");
+    })
+    .catch((error) => {
+        console.error(
+            "MongoDB Connection Error:",
+            error.message
+        );
+    });
 
 const app = express();
 
@@ -263,10 +280,81 @@ Return only the JSON object.
 
 
             // =========================
-            // Send result to frontend
-            // =========================
+// Save Assessment to MongoDB
+// =========================
 
-            res.json(result);
+const assessment = new Assessment({
+
+    assessmentId:
+        "OA-" + Date.now(),
+
+    farmerName:
+        req.body.farmerName || "",
+
+    batchId:
+        req.body.batchId || "",
+
+    quantity:
+        req.body.quantity || "",
+
+    location:
+        req.body.location || "",
+
+    imageName:
+        req.file.originalname || "",
+
+    qualityScore:
+        Number(result.qualityScore) || 0,
+
+    grade:
+        result.grade || "",
+
+    gradeAPercentage:
+        Number(result.gradeAPercentage) || 0,
+
+    ursPercentage:
+        Number(result.ursPercentage) || 0,
+
+    size:
+        Number(result.size) || 0,
+
+    color:
+        Number(result.color) || 0,
+
+    visibleDefects:
+        Number(result.visibleDefects) || 0,
+
+    uniformity:
+        Number(result.uniformity) || 0,
+
+    defects:
+        Array.isArray(result.defects)
+            ? result.defects
+            : [],
+
+    recommendation:
+        result.recommendation || "",
+
+    status:
+        "Completed"
+});
+
+await assessment.save();
+
+console.log(
+    "Assessment saved:",
+    assessment.assessmentId
+);
+
+
+// =========================
+// Send result to frontend
+// =========================
+
+res.json({
+    ...result,
+    assessmentId: assessment.assessmentId
+});
 
 
         } catch (error) {
@@ -290,6 +378,33 @@ Return only the JSON object.
     }
 );
 
+// =========================
+// Assessment History API
+// =========================
+
+app.get("/assessments", async (req, res) => {
+
+    try {
+
+        const assessments =
+            await Assessment
+                .find()
+                .sort({ createdAt: -1 });
+
+        res.json(assessments);
+
+    } catch (error) {
+
+        console.error(
+            "History Error:",
+            error
+        );
+
+        res.status(500).json({
+            error: "Failed to fetch assessments"
+        });
+    }
+});
 
 // =========================
 // Render Port

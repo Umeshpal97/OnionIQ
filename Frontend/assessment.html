@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>New Assessment - OnionIQ</title>
+
+    <link rel="stylesheet" href="./css/style.css">
+
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+    <header class="top-header">
+
+    <a href="./index.html" class="logo">
+        🧅 <span>Onion</span>IQ
+    </a>
+
+
+    <!-- DESKTOP NAVIGATION -->
+
+    <nav class="desktop-nav">
+
+        <a href="./index.html">
+            Home
+        </a>
+
+        <a href="./assessment.html">
+            New Assessment
+        </a>
+
+        <a href="./dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="./history.html">
+            History
+        </a>
+
+        <a href="./about.html">
+            About OnionIQ
+        </a>
+
+    </nav>
+
+
+    <!-- MOBILE MENU BUTTON -->
+
+    <button
+        class="menu-btn">
+
+        ☰
+
+    </button>
+
+</header>
+
+
+    <!-- ================= SIDE MENU ================= -->
+
+    <div id="menuOverlay"
+         class="menu-overlay"
+         onclick="closeMenu()">
+    </div>
+
+
+    <aside id="sideMenu" class="side-menu">
+
+        <div class="menu-header">
+
+            <a href="./index.html" class="logo">
+                🧅 <span>Onion</span>IQ
+            </a>
+
+            <button class="close-menu"
+                    onclick="closeMenu()">
+                ✕
+            </button>
+
+        </div>
+
+
+        <div class="menu-links">
+
+            <a href="./index.html">
+                🏠
+                <span>Home</span>
+            </a>
+
+            <a href="./assessment.html"
+               class="menu-active">
+                🧅
+                <span>New Assessment</span>
+            </a>
+
+            <a href="./dashboard.html">
+                📊
+                <span>Dashboard</span>
+            </a>
+
+            <a href="./history.html">
+                🕘
+                <span>History</span>
+            </a>
+
+            <a href="./about.html">
+                ℹ️
+                <span>About OnionIQ</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= ASSESSMENT PAGE ================= -->
+
+    <main class="assessment-page">
+
+        <!-- PAGE HEADING -->
+
+        <section class="page-heading">
+
+            <p class="section-tag">
+                AI ASSESSMENT
+            </p>
+
+            <h1>
+                New Onion
+                <span>Assessment</span>
+            </h1>
+
+            <p>
+                Enter batch details and scan an onion image
+                to generate an AI-assisted quality assessment.
+            </p>
+
+        </section>
+
+
+        <!-- ================= ASSESSMENT CONTAINER ================= -->
+
+        <section class="assessment-container">
+
+
+            <!-- ================= FORM ================= -->
+
+            <div class="assessment-form">
+
+
+                <!-- Farmer Name -->
+
+                <div class="input-group">
+
+                    <label for="farmerName">
+                        Farmer Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="farmerName"
+                        placeholder="Enter farmer name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Batch + Quantity -->
+
+                <div class="two-input">
+
+
+                    <div class="input-group">
+
+                        <label for="batchId">
+                            Batch ID
+                        </label>
+
+                        <input
+                            type="text"
+                            id="batchId"
+                            readonly
+                            placeholder="Auto-generated"
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="quantity">
+                            Quantity (kg)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="quantity"
+                            placeholder="Enter quantity"
+                            min="1"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Location -->
+
+                <div class="input-group">
+
+                    <label for="location">
+                        Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        placeholder="Enter location"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- ================= IMAGE SCANNER ================= -->
+
+                <div class="upload-box">
+
+                    <div class="upload-icon">
+                        🧅
+                    </div>
+
+                    <h3>
+                        Scan Onion Quality
+                    </h3>
+
+                    <p>
+                        Use your camera or choose an image
+                        from your gallery.
+                    </p>
+
+
+                    <div class="scan-buttons">
+
+                        <button
+                            type="button"
+                            class="scan-btn">
+
+                            📷 Scan with Camera
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="gallery-btn">
+
+                            🖼️ Choose from Gallery
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- Gallery Input -->
+
+                    <input
+                        type="file"
+                        id="galleryInput"
+                        accept="image/*"
+                        hidden
+                    >
+
+
+                    <!-- Image Preview -->
+
+                    <div
+                        id="imagePreview"
+                        class="image-preview">
+                    </div>
+
+                </div>
+
+
+                <!-- ================= ANALYZE BUTTON ================= -->
+
+                <button
+                    type="button"
+                    id="analyzeBtn"
+                    class="analyze-btn">
+
+                    🔍 Analyze Onion
+
+                </button>
+
+
+            </div>
+
+
+            <!-- ================= RESULT PANEL ================= -->
+
+            <div
+                class="result-panel"
+                id="resultPanel">
+
+                <div class="result-placeholder">
+
+                    <div class="big-icon">
+                        🧅
+                    </div>
+
+                    <h3>
+                        Assessment Result
+                    </h3>
+
+                    <p>
+                        Scan an onion image to see
+                        the quality assessment.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= CAMERA MODAL ================= -->
+
+    <div
+        id="cameraModal"
+        class="camera-modal">
+
+        <div class="camera-box">
+
+
+            <button
+                type="button"
+                class="close-camera">
+
+                ✕
+
+            </button>
+
+
+            <h3>
+                📷 Scan Onion
+            </h3>
+
+
+            <video
+                id="cameraVideo"
+                autoplay
+                playsinline>
+            </video>
+
+
+            <button
+                type="button"
+                class="capture-btn">
+
+                📸 Capture
+
+            </button>
+
+
+            <canvas
+                id="cameraCanvas"
+                hidden>
+            </canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= BOTTOM NAV ================= -->
+
+    <nav class="bottom-nav">
+
+        <a
+            href="./index.html"
+            class="bottom-nav-item">
+
+            <span>🏠</span>
+            <small>Home</small>
+
+        </a>
+
+
+        <a
+            href="./assessment.html"
+            class="bottom-nav-item active">
+
+            <span>🧅</span>
+            <small>New Assessment</small>
+
+        </a>
+
+
+        <a
+            href="./dashboard.html"
+            class="bottom-nav-item">
+
+            <span>📊</span>
+            <small>Dashboard</small>
+
+        </a>
+
+    </nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js"></script>
+<script src="./js/script.js"></script>
+
+</body>
+
+</html>

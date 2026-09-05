@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - OnionIQ</title>
+
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <header class="top-header">
+
+    <a href="./index.html" class="logo">
+        🧅 <span>Onion</span>IQ
+    </a>
+
+
+    <!-- DESKTOP NAVIGATION -->
+
+    <nav class="desktop-nav">
+
+        <a href="./index.html">
+            Home
+        </a>
+
+        <a href="./assessment.html">
+            New Assessment
+        </a>
+
+        <a href="./dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="./history.html">
+            History
+        </a>
+
+        <a href="./about.html">
+            About OnionIQ
+        </a>
+
+    </nav>
+
+
+    <!-- MOBILE MENU BUTTON -->
+
+    <button
+        class="menu-btn">
+
+        ☰
+
+    </button>
+
+</header>
+
+
+    <!-- ================= SIDE MENU ================= -->
+
+    <div id="menuOverlay"
+         class="menu-overlay"
+         onclick="closeMenu()">
+    </div>
+
+
+    <aside id="sideMenu" class="side-menu">
+
+        <div class="menu-header">
+
+            <a href="./index.html" class="logo">
+                🧅 <span>Onion</span>IQ
+            </a>
+
+            <button class="close-menu"
+                    onclick="closeMenu()">
+                ✕
+            </button>
+
+        </div>
+
+
+        <div class="menu-links">
+
+            <a href="./index.html">
+                🏠
+                <span>Home</span>
+            </a>
+
+            <a href="./assessment.html">
+                🧅
+                <span>New Assessment</span>
+            </a>
+
+            <a href="./dashboard.html"
+               class="menu-active">
+                📊
+                <span>Dashboard</span>
+            </a>
+
+            <a href="./history.html">
+                🕘
+                <span>History</span>
+            </a>
+
+            <a href="./about.html">
+                ℹ️
+                <span>About OnionIQ</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= DASHBOARD ================= -->
+
+    <main class="dashboard-page">
+
+        <!-- PAGE HEADING -->
+
+        <section class="page-heading">
+
+            <p class="section-tag">
+                ANALYTICS
+            </p>
+
+            <h1>
+                Procurement
+                <span>Dashboard</span>
+            </h1>
+
+            <p>
+                Overview of onion quality assessments
+                and grading activity.
+            </p>
+
+        </section>
+
+
+        <!-- ================= STAT CARDS ================= -->
+
+        <section class="stats-grid">
+
+
+            <!-- Total Batches -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📦
+                </div>
+
+                <div>
+                    <h3 id="totalBatches">
+                        0
+                    </h3>
+
+                    <p>
+                        Total Batches
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- Grade A -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🟢
+                </div>
+
+                <div>
+                    <h3 id="gradeAPercentage">
+                        0%
+                    </h3>
+
+                    <p>
+                        Grade A
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- Grade B -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🟡
+                </div>
+
+                <div>
+                    <h3 id="gradeBPercentage">
+                        0%
+                    </h3>
+
+                    <p>
+                        Grade B
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- Grade C -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🟠
+                </div>
+
+                <div>
+                    <h3 id="gradeCPercentage">
+                        0%
+                    </h3>
+
+                    <p>
+                        Grade C
+                    </p>
+                </div>
+
+            </div>
+        
+            <!-- Grade D -->
+
+         <div class="stat-card">
+
+           <div class="stat-icon">
+               🔴
+              </div>
+
+            <div>
+              <h3 id="gradeDPercentage">
+                0%
+            </h3>
+
+            <p>
+            Grade D
+            </p>
+               </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- ================= RECENT ASSESSMENTS ================= -->
+
+        <section class="recent-section">
+
+            <div class="section-heading-small">
+
+                <div>
+
+                    <p class="section-tag">
+                        RECENT ACTIVITY
+                    </p>
+
+                    <h2>
+                        Recent Assessments
+                    </h2>
+
+                </div>
+
+
+                <a href="./history.html"
+                   class="view-all-btn">
+
+                    View History →
+
+                </a>
+
+            </div>
+
+
+            <div class="dashboard-table">
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Batch
+                                </th>
+
+                                <th>
+                                    Location
+                                </th>
+
+                                <th>
+                                    Score
+                                </th>
+
+                                <th>
+                                    Grade
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="recentAssessments">
+                            <tr>
+                                <td colspan="4">
+                                    Loading Assessments...
+                                </td>
+                            </tr>
+
+                            </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= NEW ASSESSMENT CTA ================= -->
+
+        <section class="dashboard-cta">
+
+            <div>
+
+                <p class="section-tag">
+                    READY TO SCAN?
+                </p>
+
+                <h2>
+                    Assess a new onion batch
+                </h2>
+
+                <p>
+                    Upload an onion image and generate
+                    a digital quality assessment.
+                </p>
+
+            </div>
+
+
+            <a href="./assessment.html"
+               class="primary-btn">
+
+                + New Assessment
+
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= BOTTOM NAVIGATION ================= -->
+
+    <nav class="bottom-nav">
+
+        <a href="./index.html"
+           class="bottom-nav-item">
+
+            <span>🏠</span>
+            <small>Home</small>
+
+        </a>
+
+
+        <a href="./assessment.html"
+           class="bottom-nav-item">
+
+            <span>🧅</span>
+            <small>New Assessment</small>
+
+        </a>
+
+
+        <a href="./dashboard.html"
+           class="bottom-nav-item active">
+
+            <span>📊</span>
+            <small>Dashboard</small>
+
+        </a>
+
+    </nav>
+
+
+ <script src="./js/script.js"></script>
+
+</body>
+
+</html>

@@ -1,25 +1,11 @@
 // ==========================================
 // ONIONIQ - MAIN JAVASCRIPT
-// AUTO ONION SCAN + CAMERA + GALLERY + GEMINI AI
+// ONE JS FILE FOR ALL PAGES
 // ==========================================
 
 
 // ==========================================
-// ELEMENTS
-// ==========================================
-
-const imageInput = document.getElementById("imageInput");
-const imageName = document.getElementById("imageName");
-
-const galleryInput = document.getElementById("galleryInput");
-
-const cameraModal = document.getElementById("cameraModal");
-const cameraVideo = document.getElementById("cameraVideo");
-const cameraCanvas = document.getElementById("cameraCanvas");
-
-
-// ==========================================
-// VARIABLES
+// GLOBAL VARIABLES
 // ==========================================
 
 let cameraStream = null;
@@ -32,29 +18,347 @@ let isCapturing = false;
 
 
 // ==========================================
-// OLD IMAGE INPUT
+// PAGE ELEMENTS
+// ==========================================
+
+const imageInput =
+    document.getElementById("imageInput");
+
+const imageName =
+    document.getElementById("imageName");
+
+const galleryInput =
+    document.getElementById("galleryInput");
+
+const cameraModal =
+    document.getElementById("cameraModal");
+
+const cameraVideo =
+    document.getElementById("cameraVideo");
+
+const cameraCanvas =
+    document.getElementById("cameraCanvas");
+
+
+// ==========================================
+// PAGE LOAD
+// ==========================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        setupNavigation();
+
+        setupAssessment();
+
+        setAutomaticBatchId();
+
+    }
+);
+
+
+function setupNavigation() {
+
+    const menuButton =
+        document.querySelector(".menu-btn");
+
+    const closeButton =
+        document.querySelector(".close-menu");
+
+    const overlay =
+        document.getElementById("menuOverlay");
+
+
+    console.log("OnionIQ Navigation Loaded");
+
+
+    // ======================================
+    // HAMBURGER
+    // ======================================
+
+    if (menuButton) {
+
+        menuButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                toggleMenu();
+
+            }
+        );
+
+    }
+
+
+    // ======================================
+    // CLOSE BUTTON
+    // ======================================
+
+    if (closeButton) {
+
+        closeButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                closeMenu();
+
+            }
+        );
+
+    }
+
+
+    // ======================================
+    // OVERLAY
+    // ======================================
+
+    if (overlay) {
+
+        overlay.addEventListener(
+            "click",
+            function () {
+
+                closeMenu();
+
+            }
+        );
+
+    }
+
+
+    // ======================================
+    // MENU LINKS
+    // ======================================
+
+    const menuLinks =
+        document.querySelectorAll(
+            ".menu-links a"
+        );
+
+
+    menuLinks.forEach(
+        function (link) {
+
+            link.addEventListener(
+                "click",
+                function () {
+
+                    closeMenu();
+
+                }
+            );
+
+        }
+    );
+
+}
+
+//  Toggle Menu
+
+function toggleMenu() {
+
+    const menu =
+        document.getElementById("sideMenu");
+
+    const overlay =
+        document.getElementById("menuOverlay");
+
+
+    if (!menu || !overlay) {
+
+        console.error(
+            "Side menu elements not found"
+        );
+
+        return;
+
+    }
+
+
+    menu.classList.toggle(
+        "menu-open"
+    );
+
+    overlay.classList.toggle(
+        "overlay-show"
+    );
+
+}
+
+
+function closeMenu() {
+
+    const menu =
+        document.getElementById("sideMenu");
+
+    const overlay =
+        document.getElementById("menuOverlay");
+
+
+    if (menu) {
+
+        menu.classList.remove(
+            "menu-open"
+        );
+
+    }
+
+
+    if (overlay) {
+
+        overlay.classList.remove(
+            "overlay-show"
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// ASSESSMENT SETUP
+// ==========================================
+
+function setupAssessment() {
+
+    const cameraButton =
+        document.querySelector(".scan-btn");
+
+    const galleryButton =
+        document.querySelector(".gallery-btn");
+
+    const analyzeButton =
+        document.getElementById("analyzeBtn");
+
+
+    // Camera
+
+    if (cameraButton) {
+
+        cameraButton.addEventListener(
+            "click",
+            openCamera
+        );
+
+    }
+
+
+    // Gallery
+
+    if (galleryButton) {
+
+        galleryButton.addEventListener(
+            "click",
+            openGallery
+        );
+
+    }
+
+
+    // Analyze
+
+    if (analyzeButton) {
+
+        analyzeButton.addEventListener(
+            "click",
+            analyzeCapturedImage
+        );
+
+    }
+
+
+    // Gallery file selection
+
+    if (galleryInput) {
+
+        galleryInput.addEventListener(
+            "change",
+            handleGalleryImage
+        );
+
+    }
+
+
+    // Camera close button
+
+    const cameraCloseButton =
+        document.querySelector(
+            ".close-camera"
+        );
+
+
+    if (cameraCloseButton) {
+
+        cameraCloseButton.addEventListener(
+            "click",
+            closeCamera
+        );
+
+    }
+
+
+    // Capture button
+
+    const captureButton =
+        document.querySelector(
+            ".capture-btn"
+        );
+
+
+    if (captureButton) {
+
+        captureButton.addEventListener(
+            "click",
+            captureImage
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// OLD IMAGE INPUT SUPPORT
 // ==========================================
 
 if (imageInput) {
 
-    imageInput.addEventListener("change", function () {
+    imageInput.addEventListener(
+        "change",
+        function () {
 
-        if (this.files && this.files.length > 0) {
+            if (
+                this.files &&
+                this.files.length > 0
+            ) {
 
-            currentImageFile = this.files[0];
+                currentImageFile =
+                    this.files[0];
 
-            if (imageName) {
 
-                imageName.textContent =
-                    "Selected: " + this.files[0].name;
+                if (imageName) {
+
+                    imageName.textContent =
+                        "Selected: " +
+                        this.files[0].name;
+
+                }
+
+
+                showImagePreview(
+                    this.files[0]
+                );
 
             }
 
-            showImagePreview(this.files[0]);
-
         }
-
-    });
+    );
 
 }
 
@@ -65,16 +369,19 @@ if (imageInput) {
 
 async function openCamera() {
 
-    if (!cameraModal || !cameraVideo) {
+    if (
+        !cameraModal ||
+        !cameraVideo
+    ) {
 
-        alert("Camera section nahi mila.");
+        alert(
+            "Camera section nahi mila."
+        );
 
         return;
 
     }
 
-
-    // Check browser camera support
 
     if (
         !navigator.mediaDevices ||
@@ -92,12 +399,8 @@ async function openCamera() {
 
     try {
 
-        // Stop previous camera if running
-
         closeCamera();
 
-
-        // Start camera
 
         cameraStream =
             await navigator.mediaDevices.getUserMedia({
@@ -123,13 +426,9 @@ async function openCamera() {
             });
 
 
-        // Connect camera to video
-
         cameraVideo.srcObject =
             cameraStream;
 
-
-        // Show modal
 
         cameraModal.style.display =
             "flex";
@@ -142,15 +441,16 @@ async function openCamera() {
         await cameraVideo.play();
 
 
-        // Reset capture state
-
         isCapturing = false;
 
 
-        // Hide manual capture button
+        // Hide manual capture because
+        // automatic detection is enabled
 
         const captureButton =
-            document.querySelector(".capture-btn");
+            document.querySelector(
+                ".capture-btn"
+            );
 
 
         if (captureButton) {
@@ -161,12 +461,7 @@ async function openCamera() {
         }
 
 
-        // Show scanning message
-
         showScanningMessage();
-
-
-        // Start automatic scan
 
         startAutomaticScan();
 
@@ -192,7 +487,6 @@ async function openCamera() {
 
         }
 
-
         else if (
             error.name ===
             "NotFoundError"
@@ -204,23 +498,21 @@ async function openCamera() {
 
         }
 
-
         else if (
             error.name ===
             "NotReadableError"
         ) {
 
             alert(
-                "Camera kisi aur application me use ho raha hai. Zoom, Teams ya dusre camera apps band karo."
+                "Camera kisi aur application me use ho raha hai. Dusre camera apps band karo."
             );
 
         }
 
-
         else {
 
             alert(
-                "Camera open nahi ho paya. Browser permission aur camera settings check karo."
+                "Camera open nahi ho paya. Camera permission check karo."
             );
 
         }
@@ -236,7 +528,7 @@ async function openCamera() {
 
 function showScanningMessage() {
 
-    let oldMessage =
+    const oldMessage =
         document.getElementById(
             "scanStatus"
         );
@@ -311,25 +603,26 @@ function updateScanMessage(text) {
         );
 
 
-    if (status) {
-
-        status.innerHTML = `
-
-            <div style="
-                margin-top:10px;
-                padding:10px;
-                text-align:center;
-                font-size:14px;
-                color:#555;
-            ">
-
-                ${text}
-
-            </div>
-
-        `;
-
+    if (!status) {
+        return;
     }
+
+
+    status.innerHTML = `
+
+        <div style="
+            margin-top:10px;
+            padding:10px;
+            text-align:center;
+            font-size:14px;
+            color:#555;
+        ">
+
+            ${text}
+
+        </div>
+
+    `;
 
 }
 
@@ -343,15 +636,9 @@ function startAutomaticScan() {
     stopAutomaticScan();
 
 
-    // Camera ko settle hone ka time
-
     scanTimer =
         setTimeout(
-            function () {
-
-                detectOnion();
-
-            },
+            detectOnion,
             1500
         );
 
@@ -379,12 +666,9 @@ function detectOnion() {
     const width =
         cameraVideo.videoWidth;
 
-
     const height =
         cameraVideo.videoHeight;
 
-
-    // Camera ready nahi hai
 
     if (
         !width ||
@@ -401,8 +685,6 @@ function detectOnion() {
 
     }
 
-
-    // Small canvas for detection
 
     const scanWidth =
         160;
@@ -421,7 +703,6 @@ function detectOnion() {
     cameraCanvas.width =
         scanWidth;
 
-
     cameraCanvas.height =
         scanHeight;
 
@@ -437,27 +718,20 @@ function detectOnion() {
 
 
     ctx.drawImage(
-
         cameraVideo,
-
         0,
         0,
-
         scanWidth,
         scanHeight
-
     );
 
 
     const imageData =
         ctx.getImageData(
-
             0,
             0,
-
             scanWidth,
             scanHeight
-
         );
 
 
@@ -465,12 +739,9 @@ function detectOnion() {
         imageData.data;
 
 
-    let onionPixels =
-        0;
+    let onionPixels = 0;
 
-
-    let totalPixels =
-        0;
+    let totalPixels = 0;
 
 
     // ======================================
@@ -486,16 +757,12 @@ function detectOnion() {
         const r =
             data[i];
 
-
         const g =
             data[i + 1];
-
 
         const b =
             data[i + 2];
 
-
-        // Ignore dark pixels
 
         if (
             r < 35 &&
@@ -511,40 +778,27 @@ function detectOnion() {
         totalPixels++;
 
 
-        // Onion-like warm colors
-
         const warmColor =
 
             (
-
                 r > g * 1.10 &&
-
                 r > b * 1.15
-
             )
 
             ||
 
             (
-
                 r > 100 &&
-
                 g > 70 &&
-
                 b < 90
-
             )
 
             ||
 
             (
-
                 r > 130 &&
-
                 g > 100 &&
-
                 b < 100
-
             );
 
 
@@ -572,13 +826,10 @@ function detectOnion() {
 
 
     console.log(
-
         "Onion detection:",
-
         Math.round(
             percentage * 100
         ) + "%"
-
     );
 
 
@@ -595,15 +846,11 @@ function detectOnion() {
         );
 
 
-        // Automatically capture after 1.5 sec
-
         detectionTimer =
             setTimeout(
                 function () {
 
-                    if (
-                        !isCapturing
-                    ) {
+                    if (!isCapturing) {
 
                         captureAutomatically();
 
@@ -622,8 +869,6 @@ function detectOnion() {
             "🔍 Looking for onion..."
         );
 
-
-        // Continue scanning
 
         scanTimer =
             setTimeout(
@@ -654,8 +899,7 @@ function captureAutomatically() {
     }
 
 
-    isCapturing =
-        true;
+    isCapturing = true;
 
 
     stopAutomaticScan();
@@ -669,7 +913,6 @@ function captureAutomatically() {
     const width =
         cameraVideo.videoWidth;
 
-
     const height =
         cameraVideo.videoHeight;
 
@@ -679,19 +922,15 @@ function captureAutomatically() {
         !height
     ) {
 
-        isCapturing =
-            false;
+        isCapturing = false;
 
         return;
 
     }
 
 
-    // Full resolution
-
     cameraCanvas.width =
         width;
-
 
     cameraCanvas.height =
         height;
@@ -704,19 +943,13 @@ function captureAutomatically() {
 
 
     context.drawImage(
-
         cameraVideo,
-
         0,
         0,
-
         width,
         height
-
     );
 
-
-    // Convert camera image to JPG
 
     cameraCanvas.toBlob(
 
@@ -728,30 +961,21 @@ function captureAutomatically() {
                     "Image capture nahi ho payi."
                 );
 
-
-                isCapturing =
-                    false;
-
+                isCapturing = false;
 
                 return;
 
             }
 
 
-            // Create File
-
             const file =
                 new File(
-
                     [blob],
-
                     "onion-auto-scan.jpg",
-
                     {
                         type:
                             "image/jpeg"
                     }
-
                 );
 
 
@@ -759,12 +983,8 @@ function captureAutomatically() {
                 file;
 
 
-            // Close camera
-
             closeCamera();
 
-
-            // Show captured image
 
             showImagePreview(
                 file
@@ -777,6 +997,17 @@ function captureAutomatically() {
         0.90
 
     );
+
+}
+
+
+// ==========================================
+// MANUAL CAPTURE
+// ==========================================
+
+function captureImage() {
+
+    captureAutomatically();
 
 }
 
@@ -803,8 +1034,7 @@ function closeCamera() {
             );
 
 
-        cameraStream =
-            null;
+        cameraStream = null;
 
     }
 
@@ -825,14 +1055,13 @@ function closeCamera() {
     }
 
 
-    isCapturing =
-        false;
+    isCapturing = false;
 
 }
 
 
 // ==========================================
-// STOP AUTOMATIC SCAN
+// STOP SCAN
 // ==========================================
 
 function stopAutomaticScan() {
@@ -843,8 +1072,7 @@ function stopAutomaticScan() {
             scanTimer
         );
 
-        scanTimer =
-            null;
+        scanTimer = null;
 
     }
 
@@ -855,21 +1083,9 @@ function stopAutomaticScan() {
             detectionTimer
         );
 
-        detectionTimer =
-            null;
+        detectionTimer = null;
 
     }
-
-}
-
-
-// ==========================================
-// MANUAL CAPTURE SUPPORT
-// ==========================================
-
-function captureImage() {
-
-    captureAutomatically();
 
 }
 
@@ -895,101 +1111,27 @@ function openGallery() {
 
 }
 
-// ==========================================
-// AUTOMATIC BATCH ID GENERATOR
-// ==========================================
-
-function generateBatchId() {
-
-    const year = new Date().getFullYear();
-
-    let batchNumber =
-        parseInt(
-            localStorage.getItem("onioniqBatchNumber") || "0"
-        );
-
-    batchNumber++;
-
-    localStorage.setItem(
-        "onioniqBatchNumber",
-        batchNumber
-    );
-
-    const formattedNumber =
-        String(batchNumber).padStart(4, "0");
-
-    return `ON-${year}-${formattedNumber}`;
-}
-
-
-// ==========================================
-// SET BATCH ID
-// ==========================================
-
-function setAutomaticBatchId() {
-
-    const batchIdElement =
-        document.getElementById("batchId");
-
-    if (!batchIdElement) {
-        return;
-    }
-
-    // Only generate if empty
-    if (!batchIdElement.value.trim()) {
-
-        batchIdElement.value =
-            generateBatchId();
-
-    }
-
-}
-
-
-// ==========================================
-// RUN WHEN PAGE LOADS
-// ==========================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-
-        setAutomaticBatchId();
-
-    }
-);
-
 
 // ==========================================
 // GALLERY IMAGE
 // ==========================================
 
-if (galleryInput) {
+function handleGalleryImage() {
 
-    galleryInput.addEventListener(
+    if (
+        this.files &&
+        this.files.length > 0
+    ) {
 
-        "change",
-
-        function () {
-
-            if (
-                this.files &&
-                this.files.length > 0
-            ) {
-
-                currentImageFile =
-                    this.files[0];
+        currentImageFile =
+            this.files[0];
 
 
-                showImagePreview(
-                    this.files[0]
-                );
+        showImagePreview(
+            this.files[0]
+        );
 
-            }
-
-        }
-
-    );
+    }
 
 }
 
@@ -1027,42 +1169,20 @@ function showImagePreview(file) {
         <div class="preview-content">
 
             <img
-
                 src="${imageURL}"
-
                 alt="Scanned Onion"
-
                 class="preview-image"
-
             >
 
-
-            <p
-                style="
-                    color:#159447;
-                    font-weight:600;
-                    margin:10px 0;
-                "
-            >
+            <p style="
+                color:#159447;
+                font-weight:600;
+                margin:10px 0;
+            ">
 
                 ✅ Onion image captured successfully
 
             </p>
-
-
-            <button
-
-                type="button"
-
-                class="analyze-btn"
-
-                onclick="analyzeCapturedImage()"
-
-            >
-
-                🤖 Analyze with AI
-
-            </button>
 
         </div>
 
@@ -1072,25 +1192,69 @@ function showImagePreview(file) {
 
 
 // ==========================================
-// SCROLL TO ASSESSMENT
+// BATCH ID
 // ==========================================
 
-function scrollToAssessment() {
+function generateBatchId() {
 
-    const assessment =
-        document.getElementById(
-            "assessment"
+    const year =
+        new Date().getFullYear();
+
+
+    let batchNumber =
+        parseInt(
+            localStorage.getItem(
+                "onioniqBatchNumber"
+            ) || "0"
         );
 
 
-    if (assessment) {
+    batchNumber++;
 
-        assessment.scrollIntoView({
 
-            behavior:
-                "smooth"
+    localStorage.setItem(
+        "onioniqBatchNumber",
+        batchNumber
+    );
 
-        });
+
+    const formattedNumber =
+        String(
+            batchNumber
+        ).padStart(
+            4,
+            "0"
+        );
+
+
+    return `ON-${year}-${formattedNumber}`;
+
+}
+
+
+// ==========================================
+// SET BATCH ID
+// ==========================================
+
+function setAutomaticBatchId() {
+
+    const batchIdElement =
+        document.getElementById(
+            "batchId"
+        );
+
+
+    if (!batchIdElement) {
+        return;
+    }
+
+
+    if (
+        !batchIdElement.value.trim()
+    ) {
+
+        batchIdElement.value =
+            generateBatchId();
 
     }
 
@@ -1098,22 +1262,7 @@ function scrollToAssessment() {
 
 
 // ==========================================
-// DEMO BUTTON
-// ==========================================
-
-function showDemo() {
-
-    alert(
-
-        "Scan an onion. OnionIQ will automatically capture the image and analyze it with AI."
-
-    );
-
-}
-
-
-// ==========================================
-// ANALYZE BUTTON
+// ANALYZE
 // ==========================================
 
 function analyzeImage() {
@@ -1123,15 +1272,18 @@ function analyzeImage() {
 }
 
 
+function analyzeOnion() {
+
+    analyzeCapturedImage();
+
+}
+
+
 // ==========================================
-// REAL GEMINI AI ANALYSIS
+// AI ANALYSIS
 // ==========================================
 
 async function analyzeCapturedImage() {
-
-    // ======================================
-    // GET FORM VALUES
-    // ======================================
 
     const farmerName =
         document.getElementById(
@@ -1158,7 +1310,7 @@ async function analyzeCapturedImage() {
 
 
     // ======================================
-    // VALIDATE FORM
+    // FORM VALIDATION
     // ======================================
 
     if (
@@ -1178,7 +1330,7 @@ async function analyzeCapturedImage() {
 
 
     // ======================================
-    // VALIDATE IMAGE
+    // IMAGE VALIDATION
     // ======================================
 
     if (!currentImageFile) {
@@ -1191,10 +1343,6 @@ async function analyzeCapturedImage() {
 
     }
 
-
-    // ======================================
-    // RESULT PANEL
-    // ======================================
 
     const resultPanel =
         document.getElementById(
@@ -1230,88 +1378,53 @@ async function analyzeCapturedImage() {
 
     try {
 
-        // ==================================
-        // CREATE FORMDATA
-        // ==================================
-
         const formData =
             new FormData();
 
 
-        // Image
-
         formData.append(
-
             "image",
-
             currentImageFile
-
         );
 
 
-        // Farmer details
-
         formData.append(
-
             "farmerName",
-
-            farmerName
-
+            document.getElementById("farmerName")?.value.trim() || ""
         );
 
-
+        
         formData.append(
-
             "batchId",
-
-            batchId
-
+            document.getElementById("batchId")?.value.trim() || ""
         );
 
 
         formData.append(
-
             "quantity",
-
-            quantity
-
+            document.getElementById("quantity")?.value.trim() || ""
         );
 
 
         formData.append(
-
             "location",
-
-            location
-
+            document.getElementById("location")?.value.trim() || ""
         );
 
 
         // ==================================
-        // SEND TO NODE BACKEND
+        // BACKEND
         // ==================================
 
         const response =
             await fetch(
-
                 "https://onioniq-vvar.onrender.com/analyze-onion",
-
                 {
-
-                    method:
-                        "POST",
-
-                    body:
-                        formData
-
+                    method: "POST",
+                    body: formData
                 }
-
             );
 
-
-        // ==================================
-        // GET JSON
-        // ==================================
 
         const data =
             await response.json();
@@ -1323,35 +1436,20 @@ async function analyzeCapturedImage() {
         );
 
 
-        // ==================================
-        // CHECK ERROR
-        // ==================================
-
         if (!response.ok) {
 
             throw new Error(
-
                 data.error ||
-
                 data.details ||
-
                 "AI analysis failed."
-
             );
 
         }
 
 
-        // ==================================
-        // SHOW REAL AI RESULT
-        // ==================================
-
         showAIResult(
-
             data,
-
             batchId
-
         );
 
     }
@@ -1360,11 +1458,8 @@ async function analyzeCapturedImage() {
     catch (error) {
 
         console.error(
-
             "AI Analysis Error:",
-
             error
-
         );
 
 
@@ -1378,26 +1473,19 @@ async function analyzeCapturedImage() {
                         ⚠️
                     </div>
 
-
                     <h3>
                         Analysis Failed
                     </h3>
 
-
                     <p>
-                        ${error.message}
+                        ${escapeHTML(
+                            error.message
+                        )}
                     </p>
 
-
                     <button
-
                         type="button"
-
-                        class="analyze-btn"
-
-                        onclick="analyzeCapturedImage()"
-
-                    >
+                        class="analyze-btn retry-analysis-btn">
 
                         🔄 Try Again
 
@@ -1407,6 +1495,22 @@ async function analyzeCapturedImage() {
 
             `;
 
+
+            const retryButton =
+                resultPanel.querySelector(
+                    ".retry-analysis-btn"
+                );
+
+
+            if (retryButton) {
+
+                retryButton.addEventListener(
+                    "click",
+                    analyzeCapturedImage
+                );
+
+            }
+
         }
 
     }
@@ -1415,7 +1519,7 @@ async function analyzeCapturedImage() {
 
 
 // ==========================================
-// SHOW REAL AI RESULT
+// SHOW AI RESULT
 // ==========================================
 
 function showAIResult(
@@ -1430,10 +1534,37 @@ function showAIResult(
 
 
     if (!resultPanel) {
-
         return;
-
     }
+
+
+    // ======================================
+    // SAVE DATA FOR PDF
+    // ======================================
+
+    window.lastAIResult =
+        data;
+
+    window.lastBatchId =
+        batchId;
+
+    window.lastFarmerName =
+        document.getElementById(
+            "farmerName"
+        )?.value.trim() || "";
+
+    window.lastQuantity =
+        document.getElementById(
+            "quantity"
+        )?.value.trim() || "";
+
+    window.lastLocation =
+        document.getElementById(
+            "location"
+        )?.value.trim() || "";
+
+    window.lastImageFile =
+        currentImageFile;
 
 
     // ======================================
@@ -1493,47 +1624,72 @@ function showAIResult(
 
 
     // ======================================
-    // DEFECTS
+    // GRADE CLASS
     // ======================================
 
-    let defectsHTML =
-        "";
+    let gradeClass =
+        "grade-result";
 
 
     if (
-        Array.isArray(
-            data.defects
-        ) &&
+        String(grade).toUpperCase() ===
+        "A"
+    ) {
+
+        gradeClass =
+            "grade-result grade-a-result";
+
+    }
+
+    else if (
+        String(grade).toUpperCase() ===
+        "B"
+    ) {
+
+        gradeClass =
+            "grade-result grade-b-result";
+
+    }
+
+    else if (
+        String(grade).toUpperCase() ===
+        "C"
+    ) {
+
+        gradeClass =
+            "grade-result grade-c-result";
+
+    }
+
+
+    // ======================================
+    // DEFECTS
+    // ======================================
+
+    let defectsHTML = "";
+
+
+    if (
+        Array.isArray(data.defects) &&
         data.defects.length > 0
     ) {
 
         defectsHTML = `
 
-            <div
-                style="
-                    margin-top:20px;
-                    padding:15px;
-                    background:#fff7f0;
-                    border-radius:10px;
-                "
-            >
+            <div class="defects-box">
 
-                <strong>
-                    Detected Defects
-                </strong>
+                <div class="defects-title">
+                    ⚠️ Detected Defects
+                </div>
 
-                <ul
-                    style="
-                        margin-top:10px;
-                        padding-left:20px;
-                        color:#555;
-                    "
-                >
+                <ul class="defects-list">
 
                     ${data.defects
                         .map(
                             defect =>
-                                `<li>${defect}</li>`
+                                `<li>
+                                    ${escapeHTML(defect)}
+                                </li>`
                         )
                         .join("")}
 
@@ -1545,30 +1701,21 @@ function showAIResult(
 
     }
 
-
     else {
 
         defectsHTML = `
 
-            <div
-                style="
-                    margin-top:20px;
-                    padding:15px;
-                    background:#f0f7f0;
-                    border-radius:10px;
-                "
-            >
+            <div class="defects-box">
 
-                <strong>
-                    Detected Defects
-                </strong>
+                <div class="defects-title">
+                    ✅ Detected Defects
+                </div>
 
-                <p
-                    style="
-                        margin-top:8px;
-                        color:#159447;
-                    "
-                >
+                <p style="
+                    margin:0;
+                    color:#4d843d;
+                    font-size:11px;
+                ">
 
                     No major visible defects detected.
 
@@ -1589,119 +1736,140 @@ function showAIResult(
 
         <div class="result-content">
 
-            <h3>
-                🤖 AI Assessment Result
-            </h3>
+            <!-- HEADER -->
 
+            <div class="result-title">
 
-            <p
-                style="
-                    margin:15px 0;
-                    color:#777;
-                "
-            >
+                <div class="result-ai-icon">
+                    🤖
+                </div>
 
-                Batch:
-                <strong>
-                    ${escapeHTML(batchId)}
-                </strong>
+                <div>
 
-            </p>
+                    <p class="result-label">
+                        AI ASSESSMENT
+                    </p>
 
+                    <h3>
+                        Quality Result
+                    </h3>
 
-            <!-- QUALITY SCORE -->
-
-            <div class="score">
-
-                ${qualityScore}
+                </div>
 
             </div>
 
 
-            <p>
-                Quality Score
-            </p>
+            <!-- BATCH -->
+
+            <div class="result-batch">
+
+                <span>
+                    Batch ID
+                </span>
+
+                <strong>
+                    ${escapeHTML(batchId)}
+                </strong>
+
+            </div>
+
+
+            <!-- SCORE -->
+
+            <div class="score-card">
+
+                <div class="score-circle">
+
+                    <strong>
+                        ${qualityScore}
+                    </strong>
+
+                    <span>
+                        /100
+                    </span>
+
+                </div>
+
+                <div class="score-info">
+
+                    <span>
+                        QUALITY SCORE
+                    </span>
+
+                    <p>
+                        Overall onion quality
+                    </p>
+
+                </div>
+
+            </div>
 
 
             <!-- GRADE -->
 
-            <div class="grade">
+            <div class="${gradeClass}">
 
-                Grade ${escapeHTML(grade)}
+                <span>
+                    OVERALL GRADE
+                </span>
+
+                <strong>
+                    Grade ${escapeHTML(grade)}
+                </strong>
+
+                <small>
+                    AI-assisted classification
+                </small>
 
             </div>
 
 
             <!-- GRADE A + URS -->
 
-            <div
-                style="
-                    display:grid;
-                    grid-template-columns:1fr 1fr;
-                    gap:12px;
-                    margin:20px 0;
-                "
-            >
+            <div class="result-mini-grid">
 
-                <div
-                    style="
-                        padding:15px;
-                        background:#f0f7f0;
-                        border-radius:10px;
-                        text-align:center;
-                    "
-                >
+                <div class="result-mini-card grade-a-mini">
+
+                    <span>
+                        Grade A
+                    </span>
 
                     <strong>
-                        Grade A
+                        ${gradeAPercentage}%
                     </strong>
 
-                    <div
-                        style="
-                            font-size:24px;
-                            font-weight:700;
-                            margin-top:5px;
-                        "
-                    >
-
-                        ${gradeAPercentage}%
-
-                    </div>
+                    <small>
+                        Premium quality
+                    </small>
 
                 </div>
 
 
-                <div
-                    style="
-                        padding:15px;
-                        background:#fff7f0;
-                        border-radius:10px;
-                        text-align:center;
-                    "
-                >
+                <div class="result-mini-card urs-mini">
+
+                    <span>
+                        URS
+                    </span>
 
                     <strong>
-                        URS
+                        ${ursPercentage}%
                     </strong>
 
-                    <div
-                        style="
-                            font-size:24px;
-                            font-weight:700;
-                            margin-top:5px;
-                        "
-                    >
-
-                        ${ursPercentage}%
-
-                    </div>
+                    <small>
+                        Undersized
+                    </small>
 
                 </div>
 
             </div>
 
 
-            <!-- SIZE -->
+            <!-- PARAMETERS -->
+
+            <div class="parameters-title">
+                Quality Parameters
+            </div>
+
 
             ${createQualityItem(
                 "Size",
@@ -1709,23 +1877,17 @@ function showAIResult(
             )}
 
 
-            <!-- COLOR -->
-
             ${createQualityItem(
                 "Color",
                 color
             )}
 
 
-            <!-- VISIBLE DEFECTS -->
-
             ${createQualityItem(
                 "Visible Defects",
                 visibleDefects
             )}
 
-
-            <!-- UNIFORMITY -->
 
             ${createQualityItem(
                 "Uniformity",
@@ -1740,53 +1902,53 @@ function showAIResult(
 
             <!-- RECOMMENDATION -->
 
-            <div
-                style="
-                    margin-top:20px;
-                    padding:15px;
-                    background:#f0f7f0;
-                    border-radius:10px;
-                "
-            >
+            <div class="recommendation-box">
 
-                <strong>
-                    Recommendation
-                </strong>
+                <div class="recommendation-title">
 
-                <p
-                    style="
-                        margin-top:8px;
-                        color:#555;
-                        line-height:1.5;
-                    "
-                >
+                    💡
 
+                    <strong>
+                        Recommendation
+                    </strong>
+
+                </div>
+
+                <p>
                     ${escapeHTML(
                         recommendation
                     )}
-
                 </p>
 
             </div>
 
 
+            <!-- PDF -->
+
+            <button
+                type="button"
+                class="result-action-btn pdf-btn"
+                id="downloadPdfBtn">
+
+                📄
+                <span>
+                    Download PDF Report
+                </span>
+
+            </button>
+
+
             <!-- NEW ASSESSMENT -->
 
             <button
-
                 type="button"
+                class="result-action-btn new-assessment-btn"
+                id="newAssessmentBtn">
 
-                class="analyze-btn"
-
-                onclick="location.reload()"
-
-                style="
-                    margin-top:20px;
-                "
-
-            >
-
-                🔄 New Assessment
+                🔄
+                <span>
+                    New Assessment
+                </span>
 
             </button>
 
@@ -1795,9 +1957,44 @@ function showAIResult(
     `;
 
 
-    // IMPORTANT:
-    // No scrollIntoView here.
-    // Result will stay in the right-side panel.
+    // ======================================
+    // RESULT BUTTON EVENTS
+    // ======================================
+
+    const pdfButton =
+        document.getElementById(
+            "downloadPdfBtn"
+        );
+
+
+    if (pdfButton) {
+
+        pdfButton.addEventListener(
+            "click",
+            downloadPDF
+        );
+
+    }
+
+
+    const newAssessmentButton =
+        document.getElementById(
+            "newAssessmentBtn"
+        );
+
+
+    if (newAssessmentButton) {
+
+        newAssessmentButton.addEventListener(
+            "click",
+            function () {
+
+                window.location.reload();
+
+            }
+        );
+
+    }
 
 }
 
@@ -1830,7 +2027,7 @@ function createQualityItem(
             <div class="quality-header">
 
                 <span>
-                    ${title}
+                    ${escapeHTML(title)}
                 </span>
 
                 <strong>
@@ -1895,13 +2092,522 @@ function escapeHTML(value) {
 
 
 // ==========================================
+// DOWNLOAD PDF
+// ==========================================
+
+async function downloadPDF() {
+
+    if (!window.lastAIResult) {
+
+        alert(
+            "Please complete an AI assessment first."
+        );
+
+        return;
+
+    }
+
+
+    if (!window.jspdf) {
+
+        alert(
+            "PDF library load nahi hui."
+        );
+
+        return;
+
+    }
+
+
+    const { jsPDF } =
+        window.jspdf;
+
+
+    const data =
+        window.lastAIResult;
+
+
+    const doc =
+        new jsPDF();
+
+
+    // ======================================
+    // DETAILS
+    // ======================================
+
+    const farmerName =
+        window.lastFarmerName ||
+        "N/A";
+
+
+    const batchId =
+        window.lastBatchId ||
+        "N/A";
+
+
+    const quantity =
+        window.lastQuantity ||
+        "N/A";
+
+
+    const location =
+        window.lastLocation ||
+        "N/A";
+
+
+    // ======================================
+    // AI RESULTS
+    // ======================================
+
+    const qualityScore =
+        Number(
+            data.qualityScore
+        ) || 0;
+
+
+    const grade =
+        data.grade ||
+        "N/A";
+
+
+    const gradeAPercentage =
+        Number(
+            data.gradeAPercentage
+        ) || 0;
+
+
+    const ursPercentage =
+        Number(
+            data.ursPercentage
+        ) || 0;
+
+
+    const size =
+        Number(
+            data.size
+        ) || 0;
+
+
+    const color =
+        Number(
+            data.color
+        ) || 0;
+
+
+    const visibleDefects =
+        Number(
+            data.visibleDefects
+        ) || 0;
+
+
+    const uniformity =
+        Number(
+            data.uniformity
+        ) || 0;
+
+
+    const recommendation =
+        data.recommendation ||
+        "No recommendation available.";
+
+
+    // ======================================
+    // PDF TITLE
+    // ======================================
+
+    doc.setFontSize(22);
+
+    doc.text(
+        "OnionIQ",
+        20,
+        20
+    );
+
+
+    doc.setFontSize(12);
+
+    doc.text(
+        "AI-Assisted Onion Quality Assessment Report",
+        20,
+        30
+    );
+
+
+    doc.setFontSize(10);
+
+    doc.text(
+        "Assessment Date: " +
+        new Date().toLocaleString(),
+        20,
+        40
+    );
+
+
+    // ======================================
+    // BATCH INFORMATION
+    // ======================================
+
+    doc.setFontSize(15);
+
+    doc.text(
+        "Batch Information",
+        20,
+        55
+    );
+
+
+    doc.setFontSize(11);
+
+    doc.text(
+        "Farmer Name: " +
+        farmerName,
+        20,
+        65
+    );
+
+
+    doc.text(
+        "Batch ID: " +
+        batchId,
+        20,
+        73
+    );
+
+
+    doc.text(
+        "Quantity: " +
+        quantity +
+        " kg",
+        20,
+        81
+    );
+
+
+    doc.text(
+        "Location: " +
+        location,
+        20,
+        89
+    );
+
+
+    // ======================================
+    // AI ASSESSMENT
+    // ======================================
+
+    doc.setFontSize(15);
+
+    doc.text(
+        "AI Quality Assessment",
+        20,
+        105
+    );
+
+
+    doc.setFontSize(11);
+
+    doc.text(
+        "Quality Score: " +
+        qualityScore +
+        "/100",
+        20,
+        116
+    );
+
+
+    doc.text(
+        "Overall Grade: " +
+        grade,
+        20,
+        124
+    );
+
+
+    doc.text(
+        "Grade A Percentage: " +
+        gradeAPercentage +
+        "%",
+        20,
+        132
+    );
+
+
+    doc.text(
+        "Undersized (URS): " +
+        ursPercentage +
+        "%",
+        20,
+        140
+    );
+
+
+    // ======================================
+    // QUALITY PARAMETERS
+    // ======================================
+
+    doc.setFontSize(15);
+
+    doc.text(
+        "Quality Parameters",
+        20,
+        157
+    );
+
+
+    doc.setFontSize(11);
+
+    doc.text(
+        "Size: " +
+        size +
+        "%",
+        20,
+        168
+    );
+
+
+    doc.text(
+        "Color: " +
+        color +
+        "%",
+        20,
+        176
+    );
+
+
+    doc.text(
+        "Visible Defects: " +
+        visibleDefects +
+        "%",
+        20,
+        184
+    );
+
+
+    doc.text(
+        "Uniformity: " +
+        uniformity +
+        "%",
+        20,
+        192
+    );
+
+
+    // ======================================
+    // DEFECTS
+    // ======================================
+
+    doc.setFontSize(15);
+
+    doc.text(
+        "Detected Defects",
+        20,
+        209
+    );
+
+
+    doc.setFontSize(11);
+
+
+    let y = 220;
+
+
+    if (
+        Array.isArray(data.defects) &&
+        data.defects.length > 0
+    ) {
+
+        data.defects.forEach(
+            function (defect) {
+
+                const lines =
+                    doc.splitTextToSize(
+                        "- " +
+                        String(defect),
+                        165
+                    );
+
+
+                doc.text(
+                    lines,
+                    25,
+                    y
+                );
+
+
+                y +=
+                    8 *
+                    lines.length;
+
+            }
+        );
+
+    }
+
+    else {
+
+        doc.text(
+            "No major visible defects detected.",
+            25,
+            y
+        );
+
+        y += 8;
+
+    }
+
+
+    // ======================================
+    // RECOMMENDATION
+    // ======================================
+
+    y += 10;
+
+
+    doc.setFontSize(15);
+
+    doc.text(
+        "Recommendation",
+        20,
+        y
+    );
+
+
+    y += 10;
+
+
+    doc.setFontSize(11);
+
+
+    const recommendationLines =
+        doc.splitTextToSize(
+            recommendation,
+            170
+        );
+
+
+    doc.text(
+        recommendationLines,
+        20,
+        y
+    );
+
+
+    // ======================================
+    // FOOTER
+    // ======================================
+
+    doc.setFontSize(9);
+
+    doc.text(
+        "Generated by OnionIQ",
+        20,
+        285
+    );
+
+
+    // ======================================
+    // FILE NAME
+    // ======================================
+
+    const filename =
+        "OnionIQ_Report_" +
+        batchId +
+        ".pdf";
+
+
+    // ======================================
+    // ANDROID APP
+    // ======================================
+
+    if (
+        window.AndroidPDF &&
+        typeof window.AndroidPDF.savePDF ===
+        "function"
+    ) {
+
+        try {
+
+            const pdfBase64 =
+                doc.output(
+                    "datauristring"
+                )
+                .split(",")[1];
+
+
+            const result =
+                window.AndroidPDF.savePDF(
+                    pdfBase64,
+                    filename
+                );
+
+
+            console.log(
+                "Android PDF result:",
+                result
+            );
+
+
+            if (
+                result ===
+                "SUCCESS"
+            ) {
+
+                alert(
+                    "✅ PDF saved successfully!\n\n" +
+                    "Files → Downloads → OnionIQ"
+                );
+
+            }
+
+            else {
+
+                alert(
+                    "❌ PDF save failed.\n\n" +
+                    result
+                );
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Android PDF Error:",
+                error
+            );
+
+
+            alert(
+                "❌ PDF save failed.\n\n" +
+                error.message
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+    // ======================================
+    // LAPTOP / BROWSER
+    // ======================================
+
+    doc.save(
+        filename
+    );
+
+}
+
+
+// ==========================================
 // ESC KEY
 // ==========================================
 
 document.addEventListener(
-
     "keydown",
-
     function (event) {
 
         if (
@@ -1911,10 +2617,11 @@ document.addEventListener(
 
             closeCamera();
 
+            closeMenu();
+
         }
 
     }
-
 );
 
 
@@ -1923,9 +2630,7 @@ document.addEventListener(
 // ==========================================
 
 window.addEventListener(
-
     "beforeunload",
-
     function () {
 
         if (cameraStream) {
@@ -1943,5 +2648,586 @@ window.addEventListener(
         }
 
     }
-
 );
+
+async function loadHistory() {
+
+    const historyList =
+        document.getElementById("historyList");
+
+    const loadingHistory =
+        document.getElementById("loadingHistory");
+
+    const noHistory =
+        document.getElementById("noHistory");
+
+    if (!historyList) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "https://onioniq-vvar.onrender.com/assessments"
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Failed to load assessments"
+            );
+        }
+
+        const assessments =
+            await response.json();
+
+        if (loadingHistory) {
+            loadingHistory.style.display = "none";
+        }
+
+        // Remove old generated cards
+        historyList
+            .querySelectorAll(".history-card")
+            .forEach(card => card.remove());
+
+        if (
+            !Array.isArray(assessments) ||
+            assessments.length === 0
+        ) {
+
+            if (noHistory) {
+                noHistory.style.display = "block";
+            }
+
+            return;
+        }
+
+        if (noHistory) {
+            noHistory.style.display = "none";
+        }
+
+        assessments.forEach(
+            assessment => {
+
+                const card =
+                    createHistoryCard(
+                        assessment
+                    );
+
+                historyList.insertBefore(
+                    card,
+                    noHistory
+                );
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "History loading error:",
+            error
+        );
+
+        if (loadingHistory) {
+            loadingHistory.innerHTML = `
+                <div>⚠️</div>
+
+                <h3>
+                    Unable to load history
+                </h3>
+
+                <p>
+                    Please make sure the backend is running.
+                </p>
+            `;
+        }
+    }
+}
+
+
+function createHistoryCard(assessment) {
+
+    const card =
+        document.createElement("div");
+
+    card.className =
+        "history-card";
+
+    const grade =
+        assessment.grade || "N/A";
+
+    const gradeClass =
+        grade === "A"
+            ? "grade-a"
+            : grade === "B"
+            ? "grade-b"
+            : grade === "C"
+            ? "grade-c"
+            : "grade-d";
+
+    const date =
+        assessment.createdAt
+            ? new Date(
+                assessment.createdAt
+              ).toLocaleDateString(
+                "en-GB",
+                {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                }
+              )
+            : "Date unavailable";
+
+    card.innerHTML = `
+
+        <div class="history-card-top">
+
+            <div>
+
+                <span class="batch-label">
+                    BATCH
+                </span>
+
+                <h3>
+                    ${escapeHistoryText(
+                        assessment.batchId ||
+                        assessment.assessmentId ||
+                        "N/A"
+                    )}
+                </h3>
+
+            </div>
+
+            <span class="history-grade ${gradeClass}">
+                Grade ${escapeHistoryText(grade)}
+            </span>
+
+        </div>
+
+
+        <div class="history-details">
+
+            <div>
+
+                <small>
+                    Farmer
+                </small>
+
+                <strong>
+                    ${escapeHistoryText(
+                        assessment.farmerName ||
+                        "N/A"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <small>
+                    Location
+                </small>
+
+                <strong>
+                    ${escapeHistoryText(
+                        assessment.location ||
+                        "N/A"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <small>
+                    Quantity
+                </small>
+
+                <strong>
+                    ${escapeHistoryText(
+                        assessment.quantity ||
+                        "N/A"
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <small>
+                    Score
+                </small>
+
+                <strong>
+                    ${Number(
+                        assessment.qualityScore || 0
+                    )}/100
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="history-footer">
+
+            <span>
+                📅 ${date}
+            </span>
+
+            <span class="status-success">
+                ✓ Assessed
+            </span>
+
+        </div>
+
+    `;
+
+    return card;
+}
+
+
+function escapeHistoryText(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function searchHistory() {
+
+    const input =
+        document.getElementById(
+            "historySearch"
+        );
+
+    const search =
+        input
+            ? input.value
+                .toLowerCase()
+                .trim()
+            : "";
+
+    const cards =
+        document.querySelectorAll(
+            "#historyList .history-card"
+        );
+
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+
+        const text =
+            card.innerText.toLowerCase();
+
+        if (
+            text.includes(search)
+        ) {
+
+            card.style.display =
+                "";
+
+            visibleCount++;
+
+        } else {
+
+            card.style.display =
+                "none";
+        }
+    });
+
+    const noHistory =
+        document.getElementById(
+            "noHistory"
+        );
+
+    if (noHistory) {
+
+        noHistory.style.display =
+            visibleCount === 0
+                ? "block"
+                : "none";
+    }
+}
+
+
+function clearHistorySearch() {
+
+    const input =
+        document.getElementById(
+            "historySearch"
+        );
+
+    if (input) {
+        input.value = "";
+    }
+
+    searchHistory();
+}
+
+if (
+    window.location.pathname.endsWith(
+        "history.html"
+    )
+) {
+    loadHistory();
+}
+
+// =========================
+// Dashboard Data
+// =========================
+
+async function loadDashboard() {
+
+    const totalBatches =
+        document.getElementById("totalBatches");
+
+    const gradeA =
+        document.getElementById("gradeAPercentage");
+
+    const gradeB =
+        document.getElementById("gradeBPercentage");
+
+    const gradeC =
+        document.getElementById("gradeCPercentage");
+
+    const gradeD =
+        document.getElementById("gradeDPercentage");    
+
+    const recentTable =
+        document.getElementById("recentAssessments");
+
+    // Run only on dashboard page
+    if (!recentTable) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "https://onioniq-vvar.onrender.com/assessments"
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Failed to fetch dashboard data"
+            );
+        }
+
+        const assessments =
+            await response.json();
+
+
+        // =========================
+        // Total Batches
+        // =========================
+
+        const total =
+            assessments.length;
+
+        if (totalBatches) {
+            totalBatches.textContent =
+                total.toLocaleString();
+        }
+
+
+        // =========================
+        // Grade Counts
+        // =========================
+
+        let countA = 0;
+        let countB = 0;
+        let countC = 0;
+        let countD = 0;
+
+        assessments.forEach(
+            assessment => {
+
+                const grade =
+                    String(
+                        assessment.grade || ""
+                    ).toUpperCase();
+
+                if (grade === "A") {
+                    countA++;
+                }
+
+                if (grade === "B") {
+                    countB++;
+                }
+
+                if (grade === "C") {
+                    countC++;
+                }
+
+                if (grade === "D") {
+                    countD++;
+                }
+            }
+        );
+
+
+        // =========================
+        // Grade Percentages
+        // =========================
+
+        if (total > 0) {
+
+            if (gradeA) {
+                gradeA.textContent =
+                    Math.round(
+                        (countA / total) * 100
+                    ) + "%";
+            }
+
+            if (gradeB) {
+                gradeB.textContent =
+                    Math.round(
+                        (countB / total) * 100
+                    ) + "%";
+            }
+
+            if (gradeC) {
+                gradeC.textContent =
+                    Math.round(
+                        (countC / total) * 100
+                    ) + "%";
+            }
+
+            if (gradeD) {
+                gradeD.textContent =
+                    Math.round(
+                        (countD / total) * 100
+                    ) + "%";
+            }
+
+        } else {
+
+            if (gradeA) gradeA.textContent = "0%";
+            if (gradeB) gradeB.textContent = "0%";
+            if (gradeC) gradeC.textContent = "0%";
+            if (gradeD) gradeD.textContent = "0%";
+        }
+
+
+        // =========================
+        // Recent Assessments
+        // =========================
+
+        recentTable.innerHTML = "";
+
+
+        if (assessments.length === 0) {
+
+            recentTable.innerHTML = `
+                <tr>
+                    <td colspan="4">
+                        No assessments found
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        // Latest 5 assessments
+        const recent =
+            assessments.slice(0, 5);
+
+
+        recent.forEach(
+            assessment => {
+
+                const row =
+                    document.createElement("tr");
+
+                const grade =
+                    String(
+                        assessment.grade || "N/A"
+                    ).toUpperCase();
+
+
+                let gradeClass = "";
+
+                if (grade === "A") {
+                    gradeClass = "grade-a";
+                } else if (grade === "B") {
+                    gradeClass = "grade-b";
+                } else if (grade === "C") {
+                    gradeClass = "grade-c";
+                }
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${escapeHistoryText(
+                            assessment.batchId ||
+                            assessment.assessmentId ||
+                            "N/A"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHistoryText(
+                            assessment.location ||
+                            "N/A"
+                        )}
+                    </td>
+
+                    <td>
+                        ${Number(
+                            assessment.qualityScore || 0
+                        )}
+                    </td>
+
+                    <td class="${gradeClass}">
+                        ${escapeHistoryText(grade)}
+                    </td>
+
+                `;
+
+
+                recentTable.appendChild(row);
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard loading error:",
+            error
+        );
+
+        recentTable.innerHTML = `
+            <tr>
+                <td colspan="4">
+                    Unable to load dashboard data
+                </td>
+            </tr>
+        `;
+    }
+}
+
+
+// =========================
+// Load Dashboard
+// =========================
+
+if (
+    window.location.pathname.endsWith(
+        "dashboard.html"
+    )
+) {
+    loadDashboard();
+}
