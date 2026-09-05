@@ -23,11 +23,42 @@ mongoose.connect(process.env.MONGO_URI)
         );
     });
 
+// =========================
+// Express App
+// =========================
+
 const app = express();
 
+
+// =========================
+// Image Upload
+// =========================
+
 const upload = multer({
-    storage: multer.memoryStorage()
+    storage: multer.memoryStorage(),
+
+    limits: {
+        fileSize: 10 * 1024 * 1024
+    },
+
+    fileFilter: (req, file, cb) => {
+
+        if (
+            file.mimetype === "image/jpeg" ||
+            file.mimetype === "image/png" ||
+            file.mimetype === "image/webp"
+        ) {
+            cb(null, true);
+        } else {
+            cb(
+                new Error(
+                    "Only JPG, PNG and WEBP images are supported."
+                )
+            );
+        }
+    }
 });
+
 
 app.use(cors());
 app.use(express.json());
@@ -48,7 +79,6 @@ const ai = new GoogleGenAI({
 
 async function generateWithRetry(contents) {
 
-    // Primary + fallback models
     const models = [
         "gemini-3.6-flash",
         "gemini-3.5-flash-lite"
@@ -58,25 +88,31 @@ async function generateWithRetry(contents) {
 
     for (const model of models) {
 
-        console.log(`Trying model: ${model}`);
+        console.log(
+            `Trying model: ${model}`
+        );
 
-        for (let attempt = 1; attempt <= 3; attempt++) {
+        for (let attempt = 1; attempt <= 2; attempt++) {
 
             try {
 
                 console.log(
-                    `Attempt ${attempt}/3 using ${model}`
+                    `Attempt ${attempt}/2 using ${model}`
                 );
 
-                const response = await ai.models.generateContent({
-                    model: model,
+                const response =
+                    await ai.models.generateContent({
 
-                    contents: contents,
+                        model: model,
 
-                    config: {
-                        responseMimeType: "application/json"
-                    }
-                });
+                        contents: contents,
+
+                        config: {
+                            responseMimeType:
+                                "application/json"
+                        }
+
+                    });
 
                 console.log(
                     `Success with model: ${model}`
@@ -92,46 +128,88 @@ async function generateWithRetry(contents) {
                     error?.message || "";
 
                 const status =
-                    error?.status ||
-                    error?.code ||
-                    "";
-
-                const isTemporaryError =
-                    status === 503 ||
-                    message.includes("503") ||
-                    message.includes("UNAVAILABLE") ||
-                    message.includes("high demand");
+                    Number(
+                        error?.status ||
+                        error?.code ||
+                        0
+                    );
 
                 console.log(
                     `Model ${model} failed:`,
                     message
                 );
 
-                // Non-503 error
-                if (!isTemporaryError) {
-                    throw error;
-                }
 
-                // Retry only if attempts remain
-                if (attempt < 3) {
+                // =========================
+                // Quota / Rate Limit
+                // =========================
 
-                    const waitTime =
-                        5000 * Math.pow(2, attempt - 1);
+                if (
+                    status === 429 ||
+                    message.includes("429") ||
+                    message.includes("RESOURCE_EXHAUSTED") ||
+                    message.toLowerCase().includes("quota")
+                ) {
 
                     console.log(
-                        `Retrying in ${waitTime / 1000} seconds...`
+                        `Quota/rate limit reached for ${model}`
                     );
 
-                    await new Promise(resolve =>
-                        setTimeout(resolve, waitTime)
-                    );
+                    // Don't retry the same exhausted request
+                    break;
                 }
+
+
+                // =========================
+                // Temporary Server Error
+                // =========================
+
+                const isTemporaryError =
+                    status === 503 ||
+                    message.includes("503") ||
+                    message.includes("UNAVAILABLE") ||
+                    message.toLowerCase().includes(
+                        "high demand"
+                    );
+
+
+                if (!isTemporaryError) {
+
+                    throw error;
+
+                }
+
+
+                // =========================
+                // Controlled Retry
+                // =========================
+
+                if (attempt < 2) {
+
+                    const waitTime = 3000;
+
+                    console.log(
+                        `Temporary error. Retrying in ${waitTime / 1000}s...`
+                    );
+
+                    await new Promise(
+                        resolve =>
+                            setTimeout(
+                                resolve,
+                                waitTime
+                            )
+                    );
+
+                }
+
             }
+
         }
 
         console.log(
-            `${model} unavailable. Trying fallback model...`
+            `${model} unavailable. Trying next model...`
         );
+
     }
 
     throw lastError;
@@ -145,39 +223,49 @@ async function generateWithRetry(contents) {
 app.post(
     "/analyze-onion",
     upload.single("image"),
+
     async (req, res) => {
 
         try {
 
-            // Check image
+            // =========================
+            // Check Image
+            // =========================
+
             if (!req.file) {
 
                 return res.status(400).json({
-                    error: "No onion image received"
+
+                    error:
+                        "Please upload an onion image."
+
                 });
 
             }
 
 
-            // Convert image to Base64
+            // =========================
+            // Convert Image to Base64
+            // =========================
+
             const base64Image =
                 req.file.buffer.toString("base64");
 
 
             // =========================
-            // AI Prompt
+            // Short AI Prompt
             // =========================
 
             const prompt = `
 You are an onion quality assessment AI.
 
-Analyze the provided onion image carefully.
+Analyze the provided image and assess the visible onions.
 
 Return ONLY valid JSON.
-Do NOT use markdown.
-Do NOT write any explanation outside JSON.
+No markdown.
+No explanation outside JSON.
 
-Use this exact structure:
+Use exactly:
 
 {
   "qualityScore": 0,
@@ -194,52 +282,28 @@ Use this exact structure:
 
 Rules:
 
-1. All percentage values must be numbers between 0 and 100.
+- qualityScore: 0-100
+- grade: only A, B, C or D
+- gradeAPercentage: estimated percentage suitable for Grade A
+- ursPercentage: estimated percentage of undersized onions
+- size: size quality score 0-100
+- color: color quality score 0-100
+- visibleDefects: defect-free quality score 0-100
+- uniformity: uniformity score 0-100
+- defects: array of visible defect names
+- If no visible defects, use []
+- recommendation: short procurement recommendation
 
-2. qualityScore must be a number between 0 and 100.
-
-3. grade must be one of:
-   "A", "B", "C", "D"
-
-4. gradeAPercentage means the estimated percentage
-   of onions suitable for Grade A.
-
-5. ursPercentage means the estimated percentage
-   of onions that are undersized.
-
-6. size represents size quality.
-
-7. color represents color quality.
-
-8. visibleDefects represents freedom from visible defects.
-
-9. uniformity represents uniformity of the onions.
-
-10. defects must be an array containing detected
-    defect names.
-
-11. If no defect is visible, return an empty array.
-
-12. recommendation should be a short procurement recommendation.
-
-Assess:
-
-- Onion size
-- Color
-- Visible defects
-- Uniformity
-- Damaged onions
-- Rotten onions
-- Sprouted onions
-- Undersized onions
-- Overall quality
+Check:
+size, color, uniformity, damaged onions, rotten onions,
+sprouted onions, undersized onions and overall quality.
 
 Return only the JSON object.
 `;
 
 
             // =========================
-            // Send to Gemini
+            // Gemini Analysis
             // =========================
 
             const response =
@@ -247,8 +311,13 @@ Return only the JSON object.
 
                     {
                         inlineData: {
-                            mimeType: req.file.mimetype,
-                            data: base64Image
+
+                            mimeType:
+                                req.file.mimetype,
+
+                            data:
+                                base64Image
+
                         }
                     },
 
@@ -260,101 +329,128 @@ Return only the JSON object.
 
 
             // =========================
-            // Read AI response
+            // Read AI Response
             // =========================
 
             let text =
                 response.text.trim();
 
 
-            // Remove markdown if Gemini adds it
+            // Remove accidental markdown
             text = text
                 .replace(/```json/g, "")
                 .replace(/```/g, "")
                 .trim();
 
 
-            // Convert JSON text to object
+            // =========================
+            // Parse JSON
+            // =========================
+
             const result =
                 JSON.parse(text);
 
 
             // =========================
-// Save Assessment to MongoDB
-// =========================
+            // Save Assessment
+            // =========================
 
-const assessment = new Assessment({
+            const assessment =
+                new Assessment({
 
-    assessmentId:
-        "OA-" + Date.now(),
+                    assessmentId:
+                        "OA-" + Date.now(),
 
-    farmerName:
-        req.body.farmerName || "",
+                    farmerName:
+                        req.body.farmerName || "",
 
-    batchId:
-        req.body.batchId || "",
+                    batchId:
+                        req.body.batchId || "",
 
-    quantity:
-        req.body.quantity || "",
+                    quantity:
+                        req.body.quantity || "",
 
-    location:
-        req.body.location || "",
+                    location:
+                        req.body.location || "",
 
-    imageName:
-        req.file.originalname || "",
+                    imageName:
+                        req.file.originalname || "",
 
-    qualityScore:
-        Number(result.qualityScore) || 0,
+                    qualityScore:
+                        Number(
+                            result.qualityScore
+                        ) || 0,
 
-    grade:
-        result.grade || "",
+                    grade:
+                        result.grade || "",
 
-    gradeAPercentage:
-        Number(result.gradeAPercentage) || 0,
+                    gradeAPercentage:
+                        Number(
+                            result.gradeAPercentage
+                        ) || 0,
 
-    ursPercentage:
-        Number(result.ursPercentage) || 0,
+                    ursPercentage:
+                        Number(
+                            result.ursPercentage
+                        ) || 0,
 
-    size:
-        Number(result.size) || 0,
+                    size:
+                        Number(
+                            result.size
+                        ) || 0,
 
-    color:
-        Number(result.color) || 0,
+                    color:
+                        Number(
+                            result.color
+                        ) || 0,
 
-    visibleDefects:
-        Number(result.visibleDefects) || 0,
+                    visibleDefects:
+                        Number(
+                            result.visibleDefects
+                        ) || 0,
 
-    uniformity:
-        Number(result.uniformity) || 0,
+                    uniformity:
+                        Number(
+                            result.uniformity
+                        ) || 0,
 
-    defects:
-        Array.isArray(result.defects)
-            ? result.defects
-            : [],
+                    defects:
+                        Array.isArray(
+                            result.defects
+                        )
+                            ? result.defects
+                            : [],
 
-    recommendation:
-        result.recommendation || "",
+                    recommendation:
+                        result.recommendation || "",
 
-    status:
-        "Completed"
-});
+                    status:
+                        "Completed"
 
-await assessment.save();
-
-console.log(
-    "Assessment saved:",
-    assessment.assessmentId
-);
+                });
 
 
-// =========================
-// Send result to frontend
-// =========================
+            await assessment.save();
 
-res.json({
-    ...result,
-    assessmentId: assessment.assessmentId
-});
+
+            console.log(
+                "Assessment saved:",
+                assessment.assessmentId
+            );
+
+
+            // =========================
+            // Send Result
+            // =========================
+
+            return res.json({
+
+                ...result,
+
+                assessmentId:
+                    assessment.assessmentId
+
+            });
 
 
         } catch (error) {
@@ -364,47 +460,173 @@ res.json({
                 error
             );
 
-            res.status(500).json({
 
-                error: "AI analysis failed",
+            const message =
+                error?.message || "";
 
-                details:
-                    error?.message ||
-                    "Unknown AI error"
+            const status =
+                Number(
+                    error?.status ||
+                    error?.code ||
+                    0
+                );
+
+
+            // =========================
+            // Quota / Rate Limit Error
+            // =========================
+
+            if (
+                status === 429 ||
+                message.includes("429") ||
+                message.includes("RESOURCE_EXHAUSTED") ||
+                message.toLowerCase().includes("quota")
+            ) {
+
+                return res.status(429).json({
+
+                    error:
+                        "AI request limit reached. Please try again later."
+
+                });
+
+            }
+
+
+            // =========================
+            // Temporary Gemini Error
+            // =========================
+
+            if (
+                status === 503 ||
+                message.includes("503") ||
+                message.includes("UNAVAILABLE")
+            ) {
+
+                return res.status(503).json({
+
+                    error:
+                        "AI service is temporarily busy. Please try again."
+
+                });
+
+            }
+
+
+            // =========================
+            // Invalid AI JSON
+            // =========================
+
+            if (
+                error instanceof SyntaxError
+            ) {
+
+                return res.status(502).json({
+
+                    error:
+                        "AI returned an invalid analysis. Please try again."
+
+                });
+
+            }
+
+
+            // =========================
+            // Upload Error
+            // =========================
+
+            if (
+                message.includes(
+                    "Only JPG, PNG and WEBP"
+                )
+            ) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Please upload a JPG, PNG or WEBP image."
+
+                });
+
+            }
+
+
+            // =========================
+            // File Too Large
+            // =========================
+
+            if (
+                error?.code === "LIMIT_FILE_SIZE"
+            ) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Image is too large. Please upload an image below 10 MB."
+
+                });
+
+            }
+
+
+            // =========================
+            // Generic Error
+            // =========================
+
+            return res.status(500).json({
+
+                error:
+                    "AI analysis failed. Please try again."
 
             });
 
         }
+
     }
 );
+
 
 // =========================
 // Assessment History API
 // =========================
 
-app.get("/assessments", async (req, res) => {
+app.get(
+    "/assessments",
 
-    try {
+    async (req, res) => {
 
-        const assessments =
-            await Assessment
-                .find()
-                .sort({ createdAt: -1 });
+        try {
 
-        res.json(assessments);
+            const assessments =
+                await Assessment
+                    .find()
+                    .sort({
+                        createdAt: -1
+                    });
 
-    } catch (error) {
+            res.json(
+                assessments
+            );
 
-        console.error(
-            "History Error:",
-            error
-        );
+        } catch (error) {
 
-        res.status(500).json({
-            error: "Failed to fetch assessments"
-        });
+            console.error(
+                "History Error:",
+                error
+            );
+
+            res.status(500).json({
+
+                error:
+                    "Failed to fetch assessments"
+
+            });
+
+        }
+
     }
-});
+);
+
 
 // =========================
 // Render Port
@@ -414,10 +636,14 @@ const PORT =
     process.env.PORT || 5000;
 
 
-app.listen(PORT, () => {
+app.listen(
+    PORT,
 
-    console.log(
-        `OnionIQ Backend running on port ${PORT}`
-    );
+    () => {
 
-});
+        console.log(
+            `OnionIQ Backend running on port ${PORT}`
+        );
+
+    }
+);
