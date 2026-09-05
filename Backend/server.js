@@ -80,8 +80,8 @@ const ai = new GoogleGenAI({
 async function generateWithRetry(contents) {
 
     const models = [
-        "gemini-3.6-flash",
-        "gemini-3.5-flash-lite"
+        "gemini-3.5-flash-lite",
+        "gemini-3.6-flash"
     ];
 
     let lastError;
