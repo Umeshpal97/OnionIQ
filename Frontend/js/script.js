@@ -1280,6 +1280,138 @@ function analyzeOnion() {
 
 
 // ==========================================
+// IMAGE COMPRESSION
+// ==========================================
+
+async function compressImage(file) {
+
+    return new Promise((resolve, reject) => {
+
+        const img = new Image();
+
+        img.onload = () => {
+
+            const MAX_SIZE = 1280;
+
+            let width = img.width;
+            let height = img.height;
+
+
+            // Keep original aspect ratio
+            if (width > height) {
+
+                if (width > MAX_SIZE) {
+
+                    height =
+                        Math.round(
+                            height * MAX_SIZE / width
+                        );
+
+                    width = MAX_SIZE;
+
+                }
+
+            } else {
+
+                if (height > MAX_SIZE) {
+
+                    width =
+                        Math.round(
+                            width * MAX_SIZE / height
+                        );
+
+                    height = MAX_SIZE;
+
+                }
+
+            }
+
+
+            const canvas =
+                document.createElement("canvas");
+
+            canvas.width = width;
+            canvas.height = height;
+
+
+            const ctx =
+                canvas.getContext("2d");
+
+            ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            canvas.toBlob(
+
+                blob => {
+
+                    if (!blob) {
+
+                        reject(
+                            new Error(
+                                "Image compression failed."
+                            )
+                        );
+
+                        return;
+
+                    }
+
+
+                    const compressedFile =
+                        new File(
+                            [blob],
+                            file.name.replace(
+                                /\.[^/.]+$/,
+                                ".jpg"
+                            ),
+                            {
+                                type: "image/jpeg"
+                            }
+                        );
+
+
+                    resolve(
+                        compressedFile
+                    );
+
+                },
+
+                "image/jpeg",
+
+                0.75
+
+            );
+
+        };
+
+
+        img.onerror = () => {
+
+            reject(
+                new Error(
+                    "Unable to process image."
+                )
+            );
+
+        };
+
+
+        img.src =
+            URL.createObjectURL(file);
+
+    });
+
+}
+
+
+
+// ==========================================
 // AI ANALYSIS
 // ==========================================
 
@@ -1350,6 +1482,10 @@ async function analyzeCapturedImage() {
         );
 
 
+    // ======================================
+    // SHOW LOADING
+    // ======================================
+
     if (resultPanel) {
 
         resultPanel.innerHTML = `
@@ -1376,39 +1512,79 @@ async function analyzeCapturedImage() {
     }
 
 
+    // ======================================
+    // AI REQUEST
+    // ======================================
+
     try {
 
         const formData =
             new FormData();
 
 
-        formData.append(
-            "image",
-            currentImageFile
+        // ==================================
+        // COMPRESS IMAGE
+        // ==================================
+
+        const compressedImage =
+            await compressImage(
+                currentImageFile
+            );
+
+
+        console.log(
+            "Original image:",
+            Math.round(
+                currentImageFile.size / 1024
+            ),
+            "KB"
         );
 
+
+        console.log(
+            "Compressed image:",
+            Math.round(
+                compressedImage.size / 1024
+            ),
+            "KB"
+        );
+
+
+        // ==================================
+        // ADD COMPRESSED IMAGE
+        // ==================================
+
+        formData.append(
+            "image",
+            compressedImage
+        );
+
+
+        // ==================================
+        // BATCH DETAILS
+        // ==================================
 
         formData.append(
             "farmerName",
-            document.getElementById("farmerName")?.value.trim() || ""
+            farmerName
         );
 
-        
+
         formData.append(
             "batchId",
-            document.getElementById("batchId")?.value.trim() || ""
+            batchId
         );
 
 
         formData.append(
             "quantity",
-            document.getElementById("quantity")?.value.trim() || ""
+            quantity
         );
 
 
         formData.append(
             "location",
-            document.getElementById("location")?.value.trim() || ""
+            location
         );
 
 
@@ -1426,6 +1602,10 @@ async function analyzeCapturedImage() {
             );
 
 
+        // ==================================
+        // RESPONSE
+        // ==================================
+
         const data =
             await response.json();
 
@@ -1435,6 +1615,10 @@ async function analyzeCapturedImage() {
             data
         );
 
+
+        // ==================================
+        // ERROR RESPONSE
+        // ==================================
 
         if (!response.ok) {
 
@@ -1447,21 +1631,27 @@ async function analyzeCapturedImage() {
         }
 
 
+        // ==================================
+        // SHOW RESULT
+        // ==================================
+
         showAIResult(
             data,
             batchId
         );
 
-    }
 
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "AI Analysis Error:",
             error
         );
 
+
+        // ==================================
+        // SHOW ERROR
+        // ==================================
 
         if (resultPanel) {
 
@@ -1495,6 +1685,10 @@ async function analyzeCapturedImage() {
 
             `;
 
+
+            // ==================================
+            // RETRY BUTTON
+            // ==================================
 
             const retryButton =
                 resultPanel.querySelector(
