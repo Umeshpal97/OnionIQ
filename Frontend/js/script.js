@@ -1293,46 +1293,44 @@ async function compressImage(file) {
 
             const MAX_SIZE = 1280;
 
+            // Already small image → keep original
+            if (
+                img.width <= MAX_SIZE &&
+                img.height <= MAX_SIZE
+            ) {
+                URL.revokeObjectURL(img.src);
+                resolve(file);
+                return;
+            }
+
             let width = img.width;
             let height = img.height;
 
-
-            // Keep original aspect ratio
             if (width > height) {
 
-                if (width > MAX_SIZE) {
+                height =
+                    Math.round(
+                        height * MAX_SIZE / width
+                    );
 
-                    height =
-                        Math.round(
-                            height * MAX_SIZE / width
-                        );
-
-                    width = MAX_SIZE;
-
-                }
+                width = MAX_SIZE;
 
             } else {
 
-                if (height > MAX_SIZE) {
+                width =
+                    Math.round(
+                        width * MAX_SIZE / height
+                    );
 
-                    width =
-                        Math.round(
-                            width * MAX_SIZE / height
-                        );
-
-                    height = MAX_SIZE;
-
-                }
+                height = MAX_SIZE;
 
             }
-
 
             const canvas =
                 document.createElement("canvas");
 
             canvas.width = width;
             canvas.height = height;
-
 
             const ctx =
                 canvas.getContext("2d");
@@ -1345,23 +1343,19 @@ async function compressImage(file) {
                 height
             );
 
-
             canvas.toBlob(
-
                 blob => {
 
-                    if (!blob) {
+                    URL.revokeObjectURL(img.src);
 
+                    if (!blob) {
                         reject(
                             new Error(
                                 "Image compression failed."
                             )
                         );
-
                         return;
-
                     }
-
 
                     const compressedFile =
                         new File(
@@ -1375,23 +1369,18 @@ async function compressImage(file) {
                             }
                         );
 
-
                     resolve(
                         compressedFile
                     );
-
                 },
-
                 "image/jpeg",
-
                 0.75
-
             );
-
         };
 
-
         img.onerror = () => {
+
+            URL.revokeObjectURL(img.src);
 
             reject(
                 new Error(
@@ -1401,12 +1390,9 @@ async function compressImage(file) {
 
         };
 
-
         img.src =
             URL.createObjectURL(file);
-
     });
-
 }
 
 
