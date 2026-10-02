@@ -38,5 +38,49 @@ Capture / Upload Image
 Defects + Recommendation
           ↓
     Save Assessment
+```
+
+🛠️ Tech Stack
+Frontend
+- HTML5
+- CSS3
+- JavaScript
+Backend
+- Node.js
+- Express.js
+- Multer
+- CORS
+AI
+- Google Gemini API
+Database
+- MongoDB
+- Mongoose
+Android
+- Capacitor
+Deployment
+- Vercel
+- Render
+📊 Assessment Parameters
+OnionIQ analyzes visible onion characteristics such as:
+- Size
+- Color
+- Visible Defects
+- Uniformity
+- Damaged Onions
+- Rotten Onions
+- Sprouted Onions
+- Undersized Onions
+Output
+- Quality Score
+- Grade
+- Grade A Percentage
+- URS Percentage
+- Detected Defects
+- Recommendation
+🖥️ Application
+Web Application
+OnionIQ provides a simple interface for creating a new assessment, uploading or capturing an onion image, and viewing the AI-generated result.
+Android Application
+The web application is also packaged as an Android application using Capacitor.
           ↓
  Dashboard / History / PDF
