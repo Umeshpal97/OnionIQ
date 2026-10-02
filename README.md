@@ -104,3 +104,18 @@ OnionIQ provides a simple interface for creating a new assessment, uploading or 
 ## Android Application
 
 The web application is also packaged as an Android application using Capacitor.
+
+# 🔮 Future Improvements
+
+- Larger labeled onion image dataset
+- Dedicated onion grading model
+- Improved defect detection
+- Multi-image batch analysis
+- Low-network/offline support
+- Hindi and regional language support
+- Advanced farmer and buyer analytics
+
+# 👨‍💻 Project
+
+OnionIQ — AI-Based Onion Quality Assessment & Grading
+Developed as a working prototype for smart and digital onion quality assessment.
