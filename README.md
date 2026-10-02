@@ -117,5 +117,6 @@ The web application is also packaged as an Android application using Capacitor.
 
 # 👨‍💻 Project
 
-OnionIQ — AI-Based Onion Quality Assessment & Grading
+### OnionIQ — AI-Based Onion Quality Assessment & Grading
+
 Developed as a working prototype for smart and digital onion quality assessment.
