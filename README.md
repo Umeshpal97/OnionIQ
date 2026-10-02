@@ -45,13 +45,14 @@ Defects + Recommendation
 ### 1. New Assessment
 Users can enter batch details and capture or upload an onion image.
 
-![New Assessment](screenshots/new-assessment1.png,)
+![New Assessment](screenshots/new-assessment1.png)
 ![New Assessment](screenshots/new-assessment2.png)
 
 ### 2. AI Quality Analysis
 OnionIQ analyzes the image and generates the quality score, grade, defects and recommendation.
 
-![AI Analysis Result](screenshots/ai-result.png)
+![AI Analysis Result](screenshots/ai-result1.png)
+![AI Analysis Result](screenshots/ai-result2.png)
 
 ### 3. Dashboard
 The dashboard provides an overview of assessments and quality grades.
