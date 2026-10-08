@@ -6,6 +6,14 @@ OnionIQ is an AI-powered web and Android application that helps assess onion qua
 
 Users can capture or upload an onion image and get a quality score, grade, visible defects, quality parameters, and recommendation.
 
+## 🚀 Project Links
+
+### 🌐 Live Website
+[🔗 Visit Website](https://your-website-link.com)
+
+### 📱 Android App
+[⬇️ Download APK](./app-release.apk)
+
 ---
 
 ## 🚀 Features
