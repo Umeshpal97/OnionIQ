@@ -12,7 +12,7 @@ Users can capture or upload an onion image and get a quality score, grade, visib
 [🔗 Visit Website](https://onioniq-henna.vercel.app/)
 
 ### 📱 Android App
-[⬇️ Download APK](./app-release.apk)
+[⬇️ Download APK](./app-debug.apk)
 
 ---
 
